@@ -8,9 +8,10 @@ CREATE TABLE todo(
 
 )
 
-CREATE TABLE user(
+CREATE TABLE users(
     id SERIAL PRIMARY KEY,
-    name text NOT NULL,
+    username text NOT NULL UNIQUE,
     email text NOT NULL UNIQUE,
-    password varchar NOT NULL 
+    password text NOT NULL ,
+    role varchar DEFAULT 'Basic'
 )

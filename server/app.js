@@ -1,7 +1,6 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const todoRoutes = require("./routes/todo");
 const cookieParser = require("cookie-parser");
 const { Server } = require("socket.io");
 const httpServer = require("http").createServer(app);
@@ -13,7 +12,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 //Routes
+const userRoutes = require("./routes/auth");
+const todoRoutes = require("./routes/todo");
 app.use("/api/v1/todos/", todoRoutes);
+app.use("/api/v1/auth/", userRoutes);
 
 const io = new Server(httpServer, {
   cors: {
