@@ -12,10 +12,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 //Routes
-const userRoutes = require("./routes/auth");
-const todoRoutes = require("./routes/todo");
-app.use("/api/v1/todos/", todoRoutes);
-app.use("/api/v1/auth/", userRoutes);
+const authRoutes = require("./routes/auth");
+const todoRoutes = require("./routes/task");
+const userRoutes = require("./routes/user");
+app.use("/api/v1/tasks/", todoRoutes);
+app.use("/api/v1/auth/", authRoutes);
+app.use("/api/v1/user/", userRoutes);
 
 const io = new Server(httpServer, {
   cors: {

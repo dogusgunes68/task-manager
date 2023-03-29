@@ -1,82 +1,107 @@
 const pool = require("../db/db");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
+const User = require("../models/User");
 const jwt = require("jsonwebtoken");
+const { promisify } = require("util");
 
-const secretKey = "Ssdalwd574sadasdwqwesdfgeokioj";
+const signJwt = (id) => {
+  console.log("sign id", id);
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: 5 * 60,
+  });
+};
 
-exports.register = async (req, res, next) => {
-  const { username, password, role } = req.body;
+exports.signup = async (req, res, next) => {
+  const { username, email, password, role } = req.body;
   if (password.length < 6) {
     res.status(400).json({
       message: "Password length is less than 6",
     });
   }
-  try {
-    bcrypt
-      .hash(password, 10)
-      .then(async (hashedPassword) => {
-        await pool
-          .query(
-            "INSERT INTO users (username,password,role) VALUES($1,$2,$3) RETURNING *",
-            [username, hashedPassword, role]
-          )
-          .then((user) => {
-            const maxAge = 3 * 60 * 60;
-            const token = jwt.sign(user, secretKey, {
-              expiresIn: maxAge, // 3hrs in sec
-            });
-            res.cookie("jwt", token, {
-              httpOnly: true,
-              maxAge: maxAge * 1000, // 3hrs in ms
-            });
-            res.status(200).json({
-              message: "User successfully created",
-              user,
-            });
-          });
-      })
-      .catch((err) => {
-        res.status(400).json({
-          status: "Password could not hash",
-          error: err.mesage,
-        });
-      });
-  } catch (err) {
-    res.status(401).json({
-      message: "User not created",
-      error: err.mesage,
+
+  bcrypt.hash(password, 10).then(async (hashedPassword) => {
+    const user = await new User(
+      username,
+      email,
+      hashedPassword,
+      role
+    ).createUser();
+    //user = user.rows[0];
+
+    console.log("user: ", user);
+
+    const token = signJwt(user.id);
+    res.status(201).json({
+      status: "success",
+      token,
+      data: {
+        user,
+      },
     });
-  }
+  });
 };
 
 exports.login = async (req, res, next) => {
-  const { username, password } = req.body;
-  try {
-    const user = await pool.query(
-      "SELECT * FROM users WHERE username=$1, password=$2",
-      [username, password]
-    );
-    if (!user) {
-      res.status.json({
-        message: "Login is not successfull",
-        error: "User not found",
-      });
-    } else {
-      bcrypt.compare(password, user.password).then((result) => {
-        result
-          ? res.status(200).json({
-              message: "Login successful",
-              user,
-            })
-          : res.status(400).json({
-              mesage: "Login not successful, password incorrect",
-            });
-      });
-    }
-  } catch (error) {
-    res.status(400).json({
-      status: "Failed",
-      error: error.mesage,
-    });
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return next(new Error("E-mail and password required."));
   }
+
+  const user = await User.getUserWithPassword(email);
+
+  if (!user || !(await bcrypt.compare(password, user.password))) {
+    return next(new Error("User does not exist."));
+  }
+
+  console.log("user,", user);
+  const token = signJwt(user.id);
+  res.status(200).json({
+    status: "success",
+    token,
+  });
 };
+
+exports.protect = async (req, res, next) => {
+  //check if token exist
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  }
+
+  //console.log(token);
+
+  if (!token) next(new Error("You are not logged in"));
+
+  //verify token
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+  //check if user still exists
+  const freshUser = User.getUserById(decoded.id);
+  if (!freshUser) {
+    return next(
+      new Error("the user belonging to this token does no longer exist")
+    );
+  }
+
+  //check if user changed password after the token was issued.
+
+  //grant access to protected route
+  req.user = freshUser;
+  next();
+};
+
+exports.restrictTo = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(new Error("Permission denied."));
+    }
+
+    next();
+  };
+};
+
+

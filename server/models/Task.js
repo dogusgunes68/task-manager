@@ -4,7 +4,7 @@ class Task {
     this.date = date;
     this.deadline = deadline;
     this.supervisor = supervisor;
-    this.task = task;
+    this.task_content = task_content;
   }
 
   createTask() {
