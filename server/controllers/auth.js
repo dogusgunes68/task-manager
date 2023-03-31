@@ -11,6 +11,27 @@ const signJwt = (id) => {
   });
 };
 
+const sendToken = (token, user) => {
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true,
+  };
+
+  res.cookie("jwt", token, cookieOptions);
+
+  user.password = undefined;
+
+  res.status(201).json({
+    status: "success",
+    token,
+    data: {
+      user,
+    },
+  });
+};
+
 exports.signup = async (req, res, next) => {
   const { username, email, password, role } = req.body;
   if (password.length < 6) {
@@ -32,24 +53,7 @@ exports.signup = async (req, res, next) => {
 
     const token = signJwt(user.id);
 
-    const cookieOptions = {
-      expires: new Date(
-        Date.now() + process.env.JWT_COOKIE_EXPIRES * 24 * 60 * 60 * 1000
-      ),
-      httpOnly: true,
-    };
-
-    res.cookie("jwt", token, cookieOptions);
-
-    user.password = undefined;
-
-    res.status(201).json({
-      status: "success",
-      token,
-      data: {
-        user,
-      },
-    });
+    sendToken(token, user);
   });
 };
 
@@ -68,10 +72,7 @@ exports.login = async (req, res, next) => {
 
   console.log("user,", user);
   const token = signJwt(user.id);
-  res.status(200).json({
-    status: "success",
-    token,
-  });
+  sendToken(token, user);
 };
 
 exports.protect = async (req, res, next) => {
@@ -115,5 +116,3 @@ exports.restrictTo = (...roles) => {
     next();
   };
 };
-
-
