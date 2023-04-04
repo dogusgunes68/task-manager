@@ -1,0 +1,21 @@
+#content {
+    display: inline-block;
+    justify-content: center;
+    text-align: center;
+    padding-top: 50px;
+    padding-left: 250px;
+}
+
+#task-table {
+    display: inline-block;
+}
+
+#task-table tr {
+    text-align: center;
+}
+
+th,
+td {
+    padding: 30px;
+    border: 1px solid;
+}
