@@ -1,18 +1,20 @@
 const pool = require("../db/db");
+const User = require("./../models/User");
 
 const createTask = async (req, res) => {
   try {
-    const { task_content, user_id, supervisor_id, task_date, deadline } =
-      req.body
+    const { task_content, user_id, supervisor, task_date, deadline } = req.body;
+
     const newTask = await pool.query(
       "INSERT INTO tasks (task_content,user_id,supervisor,task_date,deadline) VALUES($1,$2,$3,$4,$5) RETURNING *",
-      [task_content, user_id, supervisor_id, task_date, deadline]
+      [task_content, user_id, supervisor, task_date, deadline]
     ); //return insterted object using 'RETURNING *'
     res.status(201).json({
       status: "success",
       message: [newTask.rows],
     });
   } catch (error) {
+    console.log(error.message);
     res.status(500).json({
       error: error.message,
     });
@@ -71,11 +73,19 @@ const updateTask = async (req, res) => {
 
 const getTaskThroughoutRangeAndTasksCount = async (req, res) => {
   try {
-    const { start, end } = req.params;
-    const tasks = await pool.query(
-      "SELECT * from (select *, row_number () over (order by id) from tasks) as tbl where row_number BETWEEN $1 AND $2 order by deadline",
-      [start, end]
-    );
+    const { start, end, user_id } = req.params;
+    var query =
+      "SELECT * from (select *, row_number() over (order by deadline) from tasks where condition = $3) as tbl where row_number BETWEEN $1 AND $2  order by deadline";
+
+    const user = await User.getUserById(user_id);
+    console.log(user.rows[0].role);
+    user.rows[0].role === "user"
+      ? (query = query.replace("condition", "user_id"))
+      : (query = query.replace("condition", "supervisor"));
+
+    console.log("query:", query);
+
+    const tasks = await pool.query(query, [start, end, user_id]);
     const count = await pool.query("SELECT COUNT(*) FROM tasks");
     res.status(200).json({
       status: "success",

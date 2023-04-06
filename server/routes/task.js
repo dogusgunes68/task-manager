@@ -8,7 +8,7 @@ router
   .post(taskController.createTask);
 
 router
-  .route("/rangeoftasks/:start/:end")
+  .route("/rangeoftasks/:start/:end/:user_id")
   .get(taskController.getTaskThroughoutRangeAndTasksCount);
 
 router.route("/count").get(taskController.getTasksCount);

@@ -4,6 +4,7 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const { Server } = require("socket.io");
 const httpServer = require("http").createServer(app);
+const session = require("express-session");
 
 
 //Middlewares
@@ -11,6 +12,13 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(
+  session({
+    resave: true,
+    saveUninitialized: true,
+    secret: "secret",
+  })
+);
 
 //Routes
 const authRoutes = require("./routes/auth");

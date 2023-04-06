@@ -3,11 +3,10 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 class User {
-  constructor(username, email, password, role) {
+  constructor(username, email, password) {
     this.username = username;
     this.email = email;
     this.password = password;
-    this.role = role;
   }
 
   static async getUserWithPassword(email) {
@@ -24,8 +23,8 @@ class User {
 
   async createUser() {
     const user = await pool.query(
-      "INSERT INTO users (username,email,password,role) VALUES($1,$2,$3,$4) RETURNING *",
-      [this.username, this.email, this.password, this.role]
+      "INSERT INTO users (username,email,password) VALUES($1,$2,$3) RETURNING *",
+      [this.username, this.email, this.password]
     );
 
     return user.rows[0];
