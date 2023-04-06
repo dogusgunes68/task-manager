@@ -4,10 +4,11 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { DatePicker, Space } from "antd";
 import moment from "moment";
+import jwt from "jwt-decode";
 
 const baseUrl = "http://localhost:2000/api/v1/";
 
-export default function AddTask() {
+export default function AddTask({ token }) {
   const date = new Date(Date.now());
   const currentDate = JSON.stringify(date).slice(1, 11);
 
@@ -16,7 +17,6 @@ export default function AddTask() {
   const [post, setPost] = useState(0.0);
 
   function disabledYear(current) {
-    console.log(current);
     return (
       moment().add(-1, "days") >= current || moment().add(1, "month") <= current
     );
@@ -25,13 +25,12 @@ export default function AddTask() {
   useEffect(() => {
     axios.get(baseUrl + "user/usernames").then((response) => {
       setUsernames(response.data.data.usernames);
-      console.log(response.data.data.usernames);
+      console.log("username:", response.data.data.usernames);
     });
   }, []);
 
-  console.log("user:", user);
-
   useEffect(() => {
+    console.log("user:", user);
     if (Object.keys(user).length !== 0) {
       axios.post(baseUrl + "tasks", user).then((response) => {
         console.log("eklendi:", response);
@@ -41,9 +40,15 @@ export default function AddTask() {
 
   const assignTask = (event) => {
     event.preventDefault();
-    console.log("event:", event);
-    setUser({ ...user, task_date: new Date(Date.now()), supervisor_id: 2 });
-    setPost(Math.random());
+    const supervisor = jwt(token);
+    //console.log("event:", event);
+    console.log("supervisor:", supervisor.user);
+    setUser({
+      ...user,
+      task_date: new Date(Date.now()),
+      supervisor: supervisor.user.id,
+    });
+    setPost(Math.random() * Math.random());
   };
 
   return (
@@ -61,7 +66,7 @@ export default function AddTask() {
             setUser={setUser}
           ></UsersDropDown>
         </div>
-        <div className="divs">
+        <div>
           <label className="labels">Deadline</label>
           <Space>
             <DatePicker

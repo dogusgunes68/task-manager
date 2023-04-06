@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
 import "./../addTask.css";
+import axios from "axios";
+
+const baseUrl = "http://localhost:2000/api/v1/";
 
 function UsersDropDown({ usernames, user, setUser }) {
   const [selectedUser, setSelectedUser] = useState("Select User");
@@ -12,7 +15,17 @@ function UsersDropDown({ usernames, user, setUser }) {
     document.getElementById("user-dropdown-item").innerHTML = selectedUser;
     //get user_id by username - axios
     if (selectedUser !== "Select User") {
-      setUser({ ...user, user_id: 2 });
+      console.log("servise gitti");
+      axios
+        .get(baseUrl + `user/${selectedUser}`)
+        .then((res) => {
+          const id = res.data.data.user[0].id;
+          console.log("id:", res.data.data.user[0].id);
+          setUser({ ...user, user_id: id });
+        })
+        .catch((error) => {
+          console.log(error.message);
+        });
     }
   }, [selectedUser]);
 

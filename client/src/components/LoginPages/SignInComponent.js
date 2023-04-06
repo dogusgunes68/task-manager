@@ -4,7 +4,7 @@ import axios from "axios";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "./auth";
 
-export default function SignUpComponent({ setUser }) {
+export default function SignUpComponent({ setToken }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -14,7 +14,7 @@ export default function SignUpComponent({ setUser }) {
 
   const baseUrl = "http://localhost:2000/api/v1/";
 
-  const redirectPath = location.state?.path || "/tasks";
+  const redirectPath = location.state?.path || "/";
 
   const login = (event) => {
     event.preventDefault();
@@ -22,11 +22,13 @@ export default function SignUpComponent({ setUser }) {
     axios
       .post(baseUrl + "auth/login", { email, password })
       .then((response) => {
-        console.log(response);
+        console.log(response.data.token);
         //if token is exists, perform routing
         //auth.login(response.data.data.user);
-        setUser(response.data.data.user);
-        console.log(redirectPath);
+        //setToken(response.data.token);
+        sessionStorage.setItem("token", response.data.token);
+        setToken(response.data.token);
+        //console.log(redirectPath);
       })
       .catch((error) => {
         console.log(error.message);

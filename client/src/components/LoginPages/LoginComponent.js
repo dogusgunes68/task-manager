@@ -1,7 +1,7 @@
 import { useState } from "react";
 import SignUpComponent from "./SignInComponent";
 import RegisterComponent from "./RegisterComponent";
-function LoginComponent({ setUser }) {
+function LoginComponent({ setToken }) {
   const [isLogin, setIsLogin] = useState(true);
 
   return (
@@ -26,9 +26,9 @@ function LoginComponent({ setUser }) {
       </div>
 
       {isLogin ? (
-        <SignUpComponent setUser={setUser} />
+        <SignUpComponent setToken={setToken} />
       ) : (
-        <RegisterComponent setUser={setUser} />
+        <RegisterComponent setToken={setToken} />
       )}
     </div>
   );

@@ -11,18 +11,17 @@ import { Routes, Route } from "react-router-dom";
 import { AuthProvider, useAuth } from "./components/LoginPages/auth";
 import RequireAuth from "./components/LoginPages/RequireAuth";
 import { useEffect, useState } from "react";
-import Cookies from "universal-cookie";
+import "antd/dist/reset.css";
+import { Button } from "antd";
 
 //const socket = io.connect("http://localhost:2000");
 function App() {
-  const [user, setUser] = useState(null);
-
-  const cookies = new Cookies();
+  const [token, setToken] = useState(null);
 
   useEffect(() => {
-    const token = cookies.get("jwt");
-    console.log(token);
-  }, [user]);
+    const token = sessionStorage.getItem("token");
+    token ? setToken(token) : console.log("token yok");
+  }, [token]);
 
   return (
     <div style={{ display: "block", textAlign: "center", height: "100vh" }}>
@@ -35,41 +34,41 @@ function App() {
         <Tasks /> 
         <AddTask></AddTask> 
       </div> */}
-
       <AuthProvider>
         <Routes>
-          {user === null ? (
-            <Route path="/" element={<LoginComponent setUser={setUser} />}>
+          {token === null ? (
+            <Route path="/" element={<LoginComponent setToken={setToken} />}>
               {/* <Route index element={<Home />} /> */}
             </Route>
           ) : (
-            <Route
-              path="/"
-              element={
-                <>
-                  <NavbarMenu id="header" />
-                  <div id="header-content">
-                    <FilterMenu />
-                    <Tasks />
-                  </div>
-                </>
-                // <div>adsdadw</div>
-              }
-            />
+            <>
+              <Route
+                path="/"
+                element={
+                  <>
+                    <NavbarMenu id="header" />
+                    <div id="header-content">
+                      <FilterMenu token={token} />
+                      <Tasks />
+                    </div>
+                  </>
+                  // <div>adsdadw</div>
+                }
+              ></Route>
+              <Route
+                path="addtask"
+                element={
+                  <>
+                    <NavbarMenu id="header" />
+                    <div id="header-content">
+                      <FilterMenu token={token} />
+                      <AddTask token={token} />
+                    </div>
+                  </>
+                }
+              />
+            </>
           )}
-
-          <Route
-            path="addtask"
-            element={
-              <>
-                <NavbarMenu id="header" />
-                <div id="header-content">
-                  <FilterMenu />
-                  <AddTask />
-                </div>
-              </>
-            }
-          />
         </Routes>
       </AuthProvider>
     </div>

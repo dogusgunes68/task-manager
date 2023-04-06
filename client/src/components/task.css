@@ -14,8 +14,12 @@
     text-align: center;
 }
 
-th,
-td {
+#task-table th {
+    padding: 30px;
+    border: 1px solid;
+}
+
+#task-table td {
     padding: 30px;
     border: 1px solid;
 }
