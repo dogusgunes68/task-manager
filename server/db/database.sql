@@ -9,6 +9,8 @@ CREATE table users(
     password_change_date date
 )
 
+CREATE TYPE mystate as ENUM ('waiting',"pending","done")
+
 CREATE TABLE tasks(
     id SERIAL PRIMARY KEY,
     task_content VARCHAR(255),
@@ -17,5 +19,6 @@ CREATE TABLE tasks(
     supervisor INT not null,
     constraint fk_supervisor foreign key(supervisor) references users(id),
     task_date date not null,
-    deadline date not null
+    deadline date not null,
+    task_state mystate default 'waiting' 
 )
