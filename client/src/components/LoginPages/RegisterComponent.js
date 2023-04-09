@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-export default function RegisterComponent() {
+export default function RegisterComponent({ setToken }) {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,8 +16,8 @@ export default function RegisterComponent() {
     axios
       .post(baseUrl + "auth/signup", { username, email, password })
       .then((response) => {
-        console.log(response);
-        navigate("/tasks");
+        sessionStorage.setItem("token", response.data.token);
+        setToken(response.data.token);
       })
       .catch((error) => {
         console.log(error.message);

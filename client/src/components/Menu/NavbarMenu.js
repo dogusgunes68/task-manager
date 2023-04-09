@@ -1,12 +1,12 @@
 import React from "react";
 import "./navbarMenu.css";
 
-export default function NavbarMenu() {
+export default function NavbarMenu({ setToken }) {
   return (
     <div id="navbar-menu-container">
       <ul className="header">
         <li>
-          <a href="#">Home</a>
+          <a href="/">Home</a>
         </li>
         <li>
           <a href="#">Account</a>
@@ -15,7 +15,15 @@ export default function NavbarMenu() {
           <a href="#">Contact</a>
         </li>
         <li id="logout">
-          <a href="#">Logout</a>
+          <a
+            href="/"
+            onClick={() => {
+              sessionStorage.setItem("token", null);
+              setToken(null);
+            }}
+          >
+            Logout
+          </a>
         </li>
       </ul>
     </div>

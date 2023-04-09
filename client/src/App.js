@@ -13,14 +13,20 @@ import RequireAuth from "./components/LoginPages/RequireAuth";
 import { useEffect, useState } from "react";
 import "antd/dist/reset.css";
 import { Button } from "antd";
+import jwtDecode from "jwt-decode";
 
 //const socket = io.connect("http://localhost:2000");
 function App() {
   const [token, setToken] = useState(null);
-
+  var user = null;
+  if (token !== null) {
+    user = jwtDecode(token);
+    console.log("role", user.user.role);
+  }
   useEffect(() => {
     const token = sessionStorage.getItem("token");
     token ? setToken(token) : console.log("token yok");
+    console.log("app token", token);
   }, [token]);
 
   return (
@@ -46,7 +52,7 @@ function App() {
                 path="/"
                 element={
                   <>
-                    <NavbarMenu id="header" />
+                    <NavbarMenu id="header" setToken={setToken} />
                     <div id="header-content">
                       <FilterMenu token={token} />
                       <Tasks />
@@ -55,18 +61,20 @@ function App() {
                   // <div>adsdadw</div>
                 }
               ></Route>
-              <Route
-                path="addtask"
-                element={
-                  <>
-                    <NavbarMenu id="header" />
-                    <div id="header-content">
-                      <FilterMenu token={token} />
-                      <AddTask token={token} />
-                    </div>
-                  </>
-                }
-              />
+              {user && user.user.role === "supervisor" && (
+                <Route
+                  path="addtask"
+                  element={
+                    <>
+                      <NavbarMenu id="header" setToken={setToken} />
+                      <div id="header-content">
+                        <FilterMenu token={token} />
+                        <AddTask token={token} />
+                      </div>
+                    </>
+                  }
+                />
+              )}
             </>
           )}
         </Routes>
