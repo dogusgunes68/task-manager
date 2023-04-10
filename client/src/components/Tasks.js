@@ -6,14 +6,14 @@ import columns from "./Columns";
 import axios from "axios";
 import jwt from "jwt-decode";
 
+
 const baseUrl = "http://localhost:2000/api/v1/";
 
-export default function Tasks() {
+export default function Tasks({ socket }) {
   const [range, setRange] = useState([1, 5]);
   const [tasks, setTasks] = useState([]);
   const [page, setPage] = useState([]);
-
-  console.log("tasks sayfası");
+  const [taskState, setTaskState] = useState("");
 
   const calculatePageCount = (count) => {
     let pageCnt = Math.floor(count / 5);
@@ -44,6 +44,25 @@ export default function Tasks() {
     } catch (error) {}
   }, [range]);
 
+  //update task_state func
+  const updateTaskState = (value) => {
+    setTaskState(value);
+  };
+
+  useEffect(() => {
+    socket.on("is_task_state_changed", (data) => {
+      if (data) {
+        //axios get request
+      }
+    });
+  }, [socket]);
+
+  useEffect(() => {
+    if (taskState !== "") {
+      socket.emit("update_task_state", taskState);
+    }
+  }, [taskState]);
+
   return (
     <div id="content">
       {tasks.length === 0 ? (
@@ -72,6 +91,7 @@ export default function Tasks() {
                     <td>{task.deadline}</td>
                     <td>{task.supervisor}</td>
                     <td>{task.task_content}</td>
+                    <td>{task.task_state}</td>
                   </tr>
                 </tbody>
               );

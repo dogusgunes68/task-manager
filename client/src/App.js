@@ -14,6 +14,9 @@ import { useEffect, useState } from "react";
 import "antd/dist/reset.css";
 import { Button } from "antd";
 import jwtDecode from "jwt-decode";
+import io from "socket.io-client";
+
+const socket = io.connect("http://localhost:2000");
 
 //const socket = io.connect("http://localhost:2000");
 function App() {
@@ -55,7 +58,7 @@ function App() {
                     <NavbarMenu id="header" setToken={setToken} />
                     <div id="header-content">
                       <FilterMenu token={token} />
-                      <Tasks />
+                      <Tasks socket={socket} />
                     </div>
                   </>
                   // <div>adsdadw</div>
