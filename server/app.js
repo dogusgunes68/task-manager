@@ -37,12 +37,10 @@ const io = new Server(httpServer, {
 
 io.on("connection", (client) => {
   console.log("connected,", client.id);
-  client.on("disconnect", () => console.log("disconnected"));
-  client.on("data_inserted", (data) => {
-    //console.log(data);
-    io.emit("reload_page", data); // send data to all clients which is connected.
-    //client.emit("reload_page", data); //send data to all clients without sender client in the channel.
+  client.on("update_task_state", (task_state) => {
+    //update task state
   });
+ 
 });
 
 httpServer.listen(2000, () => {
