@@ -3,17 +3,30 @@ const User = require("./../models/User");
 
 const createTask = async (req, res) => {
   try {
-    const { task_content, user_id, supervisor, task_date, deadline } = req.body;
-
-    const newTask = await pool.query(
-      //new table name will be WORKFLOW.
-      //table properties must be change.
-      "INSERT INTO tasks (task_content,user_id,supervisor,task_date,deadline) VALUES($1,$2,$3,$4,$5) RETURNING *",
-      [task_content, user_id, supervisor, task_date, deadline]
-    ); //return insterted object using 'RETURNING *'
+    const {
+      task_content,
+      description,
+      modulname,
+      user_id,
+      supervisor,
+      task_date,
+      deadline,
+    } = req.body;
+    const newItem = await pool.query(
+      "INSERT_INTO workflow (task_content,description,modulname,user_id,supervisor,task_date,deadline) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING *",
+      [
+        task_content,
+        description,
+        modulname,
+        user_id,
+        supervisor,
+        task_date,
+        deadline,
+      ]
+    );
     res.status(201).json({
       status: "success",
-      message: [newTask.rows],
+      message: [newItem.rows],
     });
   } catch (error) {
     console.log(error.message);
@@ -25,12 +38,15 @@ const createTask = async (req, res) => {
 
 const getAllTasks = async (req, res) => {
   try {
-    const tasks = await pool.query("SELECT * FROM tasks");
+    const workflow = await pool.query("SELECT * FROM workflow");
+
     res.status(200).json({
       status: "success",
-      data: {
-        tasks,
-      },
+      data: [
+        {
+          workflow: workflow.rows,
+        },
+      ],
     });
   } catch (error) {
     res.status(500).json({
@@ -42,7 +58,7 @@ const getAllTasks = async (req, res) => {
 const deleteTask = async (req, res) => {
   try {
     const id = req.params.id;
-    await pool.query("DELETE FROM tasks WHERE id=($1)", [id]);
+    await pool.query("DELETE FROM workflow WHERE id=($1)", [id]);
     res.status(200).json({
       status: "success",
       message: "deleted",
@@ -59,7 +75,7 @@ const updateTask = async (req, res) => {
     const { task_content } = req.body;
     const id = req.params.id;
     const updatedTask = await pool.query(
-      "UPDATE tasks SET task_content = $1 WHERE id = $2",
+      "UPDATE workflow SET task_content = $1 WHERE id = $2",
       [task_content, id]
     );
     res.status(200).json({
@@ -78,7 +94,7 @@ const updateTaskState = async (req, res) => {
     const { id, task_state } = req.body;
     console.log("id:", id, " state:", task_state);
     const updatedTask = await pool.query(
-      "UPDATE tasks SET task_state=$1 WHERE id=$2 RETURNING *",
+      "UPDATE workflow SET task_state=$1 WHERE id=$2 RETURNING *",
       [task_state, id]
     );
 
@@ -97,7 +113,7 @@ const getTaskThroughoutRangeAndTasksCount = async (req, res) => {
   try {
     const { start, end, user_id } = req.params;
     var query =
-      "SELECT * from (select *, row_number() over (order by deadline) from tasks where condition = $3) as tbl where row_number BETWEEN $1 AND $2  order by deadline";
+      "SELECT * from (select *, row_number() over (order by deadline) from workflow where condition = $3) as tbl where row_number BETWEEN $1 AND $2  order by deadline";
 
     const user = await User.getUserById(user_id);
     console.log(user.rows[0].role);
@@ -107,7 +123,7 @@ const getTaskThroughoutRangeAndTasksCount = async (req, res) => {
 
     const tasks = await pool.query(query, [start, end, user_id]);
 
-    var query2 = "SELECT COUNT(*) FROM tasks WHERE condition = $1";
+    var query2 = "SELECT COUNT(*) FROM workflow WHERE condition = $1";
     user.rows[0].role === "user"
       ? (query2 = query2.replace("condition", "user_id"))
       : (query2 = query2.replace("condition", "supervisor"));
@@ -132,7 +148,7 @@ const getTaskThroughoutRangeAndTasksCount = async (req, res) => {
 
 const getTasksCount = async (req, res) => {
   try {
-    const count = await pool.query("SELECT COUNT(*) FROM tasks");
+    const count = await pool.query("SELECT COUNT(*) FROM workflow");
     res.status(200).json({
       status: "success",
       data: {

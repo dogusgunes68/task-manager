@@ -7,12 +7,11 @@ router
   .get(taskController.getAllTasks)
   .post(taskController.createTask);
 
-router
-  .route("/rangeoftasks/:start/:end/:user_id")
-  .get(taskController.getTaskThroughoutRangeAndTasksCount);
+// router
+//   .route("/rangeoftasks/:start/:end/:user_id")
+//   .get(taskController.getTaskThroughoutRangeAndTasksCount);
 
 router.route("/count").get(taskController.getTasksCount);
-
 router.route("/update/taskstate").put(taskController.updateTaskState)
 
 router
