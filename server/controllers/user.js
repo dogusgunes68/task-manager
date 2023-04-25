@@ -56,4 +56,30 @@ const getUserByUsername = async (req, res) => {
   }
 };
 
-module.exports = { getJustUserNames, getAllUsers, getUserByUsername };
+const getSupervisor = async (req, res) => {
+  try {
+    const { id } = req.body;
+    console.log("id:", id);
+    const supervisor = await pool.query("SELECT * FROM users WHERE id=$1", [
+      id,
+    ]);
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        supervisor: supervisor.rows,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+};
+
+module.exports = {
+  getJustUserNames,
+  getAllUsers,
+  getUserByUsername,
+  getSupervisor,
+};

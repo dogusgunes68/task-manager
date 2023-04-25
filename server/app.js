@@ -28,20 +28,20 @@ app.use("/api/v1/tasks/", todoRoutes);
 app.use("/api/v1/auth/", authRoutes);
 app.use("/api/v1/user/", userRoutes);
 
-const io = new Server(httpServer, {
-  cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
-  },
-});
+// const io = new Server(httpServer, {
+//   cors: {
+//     origin: "http://localhost:3000",
+//     methods: ["GET", "POST"],
+//   },
+// });
 
-io.on("connection", (client) => {
-  console.log("connected,", client.id);
-  client.on("update_task_state", (task_state) => {
-    //update task state
-  });
+// io.on("connection", (client) => {
+//   console.log("connected,", client.id);
+//   client.on("update_task_state", (task_state) => {
+//     //update task state
+//   });
  
-});
+// });
 
 httpServer.listen(2000, () => {
   console.log(`Server has started on port 2000`);

@@ -6,6 +6,8 @@ const createTask = async (req, res) => {
     const { task_content, user_id, supervisor, task_date, deadline } = req.body;
 
     const newTask = await pool.query(
+      //new table name will be WORKFLOW.
+      //table properties must be change.
       "INSERT INTO tasks (task_content,user_id,supervisor,task_date,deadline) VALUES($1,$2,$3,$4,$5) RETURNING *",
       [task_content, user_id, supervisor, task_date, deadline]
     ); //return insterted object using 'RETURNING *'
@@ -71,6 +73,26 @@ const updateTask = async (req, res) => {
   }
 };
 
+const updateTaskState = async (req, res) => {
+  try {
+    const { id, task_state } = req.body;
+    console.log("id:", id, " state:", task_state);
+    const updatedTask = await pool.query(
+      "UPDATE tasks SET task_state=$1 WHERE id=$2 RETURNING *",
+      [task_state, id]
+    );
+
+    res.status(200).json({
+      status: "success",
+      data: updatedTask,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: `${error.message}`,
+    });
+  }
+};
+
 const getTaskThroughoutRangeAndTasksCount = async (req, res) => {
   try {
     const { start, end, user_id } = req.params;
@@ -83,10 +105,16 @@ const getTaskThroughoutRangeAndTasksCount = async (req, res) => {
       ? (query = query.replace("condition", "user_id"))
       : (query = query.replace("condition", "supervisor"));
 
-    console.log("query:", query);
-
     const tasks = await pool.query(query, [start, end, user_id]);
-    const count = await pool.query("SELECT COUNT(*) FROM tasks");
+
+    var query2 = "SELECT COUNT(*) FROM tasks WHERE condition = $1";
+    user.rows[0].role === "user"
+      ? (query2 = query2.replace("condition", "user_id"))
+      : (query2 = query2.replace("condition", "supervisor"));
+    const count = await pool.query(query2, [user_id]);
+    console.log("query:", query2);
+
+    console.log("cnt:", count);
     res.status(200).json({
       status: "success",
       result: {
@@ -95,6 +123,7 @@ const getTaskThroughoutRangeAndTasksCount = async (req, res) => {
       },
     });
   } catch (error) {
+    console.log("err", error.message);
     res.status(500).json({
       error: error.message,
     });
@@ -124,4 +153,5 @@ module.exports = {
   updateTask,
   getTaskThroughoutRangeAndTasksCount,
   getTasksCount,
+  updateTaskState,
 };

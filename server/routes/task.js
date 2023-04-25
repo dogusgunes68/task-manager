@@ -13,6 +13,8 @@ router
 
 router.route("/count").get(taskController.getTasksCount);
 
+router.route("/update/taskstate").put(taskController.updateTaskState)
+
 router
   .route("/:id")
   .put(taskController.updateTask)
