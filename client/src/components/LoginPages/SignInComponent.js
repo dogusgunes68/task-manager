@@ -3,11 +3,17 @@ import "./login.css";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "./auth";
+import ErrorModal from "../Modals/ErrorModal";
 
 export default function SignUpComponent({ setToken }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(null);
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+
+  const showErrorModal = () => {
+    setIsErrorModalOpen(true);
+  };
 
   const auth = useAuth();
   const location = useLocation();
@@ -31,8 +37,8 @@ export default function SignUpComponent({ setToken }) {
         //console.log(redirectPath);
       })
       .catch((error) => {
-        console.log(error.message);
-        setError(error.message);
+        setError(error);
+        showErrorModal();
       });
   };
 
@@ -55,6 +61,11 @@ export default function SignUpComponent({ setToken }) {
           Login
         </button>
       </form>
+      <ErrorModal
+        isErrorModalOpen={isErrorModalOpen}
+        setIsErrorModalOpen={setIsErrorModalOpen}
+        error={error}
+      />
     </div>
   );
 }

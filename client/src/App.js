@@ -15,25 +15,22 @@ import "antd/dist/reset.css";
 import { Button } from "antd";
 import jwtDecode from "jwt-decode";
 import io from "socket.io-client";
-
-const socket = io.connect("http://localhost:2000");
-
+import bgLogin from "./components/LoginPages/login-bg.jpg";
 //const socket = io.connect("http://localhost:2000");
 function App() {
   const [token, setToken] = useState(null);
   var user = null;
   if (token !== null) {
     user = jwtDecode(token);
-    console.log("role", user.user.role);
   }
   useEffect(() => {
     const token = sessionStorage.getItem("token");
-    token ? setToken(token) : console.log("token yok");
-    console.log("app token", token);
+    token ? setToken(token) : setToken(token);
+    //console.log("app token", token);
   }, [token]);
 
   return (
-    <div style={{ display: "block", textAlign: "center", height: "100vh" }}>
+    <>
       {/* <InputTodo socket={socket}></InputTodo>
         <ListTodos socket={socket}></ListTodos> */}
 
@@ -46,7 +43,21 @@ function App() {
       <AuthProvider>
         <Routes>
           {token === null ? (
-            <Route path="/" element={<LoginComponent setToken={setToken} />}>
+            <Route
+              path="/"
+              element={
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    height: "100vh",
+                    backgroundImage: `url(${bgLogin})`,
+                  }}
+                >
+                  <LoginComponent setToken={setToken} />
+                </div>
+              }
+            >
               {/* <Route index element={<Home />} /> */}
             </Route>
           ) : (
@@ -54,13 +65,23 @@ function App() {
               <Route
                 path="/"
                 element={
-                  <>
-                    <NavbarMenu id="header" setToken={setToken} />
+                  <div
+                    style={{
+                      display: "block",
+                      textAlign: "center",
+                      height: "100vh",
+                    }}
+                  >
+                    <NavbarMenu
+                      id="header"
+                      name={user.user.username}
+                      setToken={setToken}
+                    />
                     <div id="header-content">
                       <FilterMenu token={token} />
-                      <Tasks socket={socket} />
+                      <Tasks role={user.user.role} />
                     </div>
-                  </>
+                  </div>
                   // <div>adsdadw</div>
                 }
               ></Route>
@@ -68,13 +89,23 @@ function App() {
                 <Route
                   path="addtask"
                   element={
-                    <>
-                      <NavbarMenu id="header" setToken={setToken} />
+                    <div
+                      style={{
+                        display: "block",
+                        textAlign: "center",
+                        height: "100vh",
+                      }}
+                    >
+                      <NavbarMenu
+                        id="header"
+                        name={user.user.username}
+                        setToken={setToken}
+                      />
                       <div id="header-content">
                         <FilterMenu token={token} />
                         <AddTask token={token} />
                       </div>
-                    </>
+                    </div>
                   }
                 />
               )}
@@ -82,7 +113,7 @@ function App() {
           )}
         </Routes>
       </AuthProvider>
-    </div>
+    </>
   );
 }
 

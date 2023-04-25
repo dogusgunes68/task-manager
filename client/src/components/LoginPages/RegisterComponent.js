@@ -1,11 +1,18 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import ErrorModal from "../Modals/ErrorModal";
 
 export default function RegisterComponent({ setToken }) {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+
+  const showErrorModal = () => {
+    setIsErrorModalOpen(true);
+  };
 
   const navigate = useNavigate();
 
@@ -20,7 +27,8 @@ export default function RegisterComponent({ setToken }) {
         setToken(response.data.token);
       })
       .catch((error) => {
-        console.log(error.message);
+        setError(error);
+        showErrorModal();
       });
   };
 
@@ -55,6 +63,11 @@ export default function RegisterComponent({ setToken }) {
           Register
         </button>
       </form>
+      <ErrorModal
+        isErrorModalOpen={isErrorModalOpen}
+        setIsErrorModalOpen={setIsErrorModalOpen}
+        error={error}
+      />
     </div>
   );
 }

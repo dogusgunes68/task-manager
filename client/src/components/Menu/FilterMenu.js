@@ -8,29 +8,18 @@ export default function FilterMenu({ token }) {
     <div id="filter-menu-container">
       <ul>
         <li className="sabitRenk">
-          <h3>Filter Menu</h3>
+          <h3>Menu</h3>
         </li>
         {user.role === "supervisor" ? (
           <li>
             <a href="/addtask">Add a new task</a>
           </li>
         ) : (
-          <li>
-            <a href="#">Change Task State</a>
-          </li>
+          null
         )}
 
         <li>
           <a href="/">Tasks</a>
-        </li>
-        <li>
-          <a href="#">Filter 4</a>
-        </li>
-        <li>
-          <a href="#">Filter 5</a>
-        </li>
-        <li>
-          <a href="#">Filter 6</a>
         </li>
       </ul>
     </div>

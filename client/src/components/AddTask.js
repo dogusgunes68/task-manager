@@ -2,9 +2,10 @@ import UsersDropDown from "./Menu/UsersDropDown";
 import "./addTask.css";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { DatePicker, Space } from "antd";
+import { Col, DatePicker, Divider, Modal, Row, Space } from "antd";
 import moment from "moment";
 import jwt from "jwt-decode";
+import ErrorModal from "./Modals/ErrorModal";
 
 const baseUrl = "http://localhost:2000/api/v1/";
 
@@ -15,6 +16,23 @@ export default function AddTask({ token }) {
   const [usernames, setUsernames] = useState([]);
   const [user, setUser] = useState({});
   const [post, setPost] = useState(0.0);
+  const [error, setError] = useState(null);
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const showErrorModal = () => {
+    setIsErrorModalOpen(true);
+  };
+
+  const showModal = (id) => {
+    setIsModalOpen(true);
+  };
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
 
   function disabledYear(current) {
     return (
@@ -32,14 +50,22 @@ export default function AddTask({ token }) {
   useEffect(() => {
     console.log("user:", user);
     if (Object.keys(user).length !== 0) {
-      axios.post(baseUrl + "tasks", user).then((response) => {
-        console.log("eklendi:", response);
-      });
+      axios
+        .post(baseUrl + "tasks", user)
+        .then((response) => {
+          console.log("eklendi:", response);
+          showModal();
+        })
+        .catch((err) => {
+          setError(err);
+          showErrorModal();
+        });
     }
   }, [post]);
 
   const assignTask = (event) => {
     event.preventDefault();
+
     const supervisor = jwt(token);
     //console.log("event:", event);
     console.log("supervisor:", supervisor.user);
@@ -58,24 +84,35 @@ export default function AddTask({ token }) {
         action="#"
         onSubmit={(event) => assignTask(event)}
       >
-        <div className="divs">
-          <label className="labels">Users</label>
-          <UsersDropDown
-            usernames={usernames}
-            user={user}
-            setUser={setUser}
-          ></UsersDropDown>
-        </div>
-        <div>
-          <label className="labels">Deadline</label>
-          <Space>
-            <DatePicker
-              onChange={(date) =>
-                setUser({ ...user, deadline: new Date(date) })
-              }
-              disabledDate={disabledYear}
-            />
-          </Space>
+        <Divider orientation="left"></Divider>
+        <Row gutter={16}>
+          <Col className="gutter-row" span={12}>
+            {" "}
+            <label className="labels">Users</label>
+          </Col>
+          <Col className="gutter-row" span={12}>
+            <UsersDropDown
+              usernames={usernames}
+              user={user}
+              setUser={setUser}
+            ></UsersDropDown>
+          </Col>
+        </Row>
+        <Divider orientation="left"></Divider>
+        <Row gutter={16}>
+          <Col className="gutter-row" span={12}>
+            <label className="labels">Deadline</label>
+          </Col>
+          <Col className="gutter-row" span={12}>
+            <Space>
+              <DatePicker
+                onChange={(date) =>
+                  setUser({ ...user, deadline: new Date(date) })
+                }
+                disabledDate={disabledYear}
+              />
+            </Space>
+          </Col>
           {/* <input
             type="date"
             id="date"
@@ -84,7 +121,9 @@ export default function AddTask({ token }) {
             min={currentDate}
             max="2023-12-31"
           ></input> */}
-        </div>
+        </Row>
+        <Divider orientation="left"></Divider>
+
         <div id="task-content">
           <label className="labels">Task Content</label>
           <textarea
@@ -94,15 +133,27 @@ export default function AddTask({ token }) {
             }
           ></textarea>
         </div>
+        <Divider orientation="left"></Divider>
+
         <div id="add-task-button">
-          <button className="btn reset-button" type="reset">
-            Reset
-          </button>
           <button className="btn btn-primary" type="submit">
             Assign Task
           </button>
         </div>
       </form>
+      <ErrorModal
+        isErrorModalOpen={isErrorModalOpen}
+        setIsErrorModalOpen={setIsErrorModalOpen}
+        error={error}
+      />
+      <Modal
+        title="Saccessfull"
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+      >
+        <div>New User Added</div>
+      </Modal>
     </div>
   );
 }
