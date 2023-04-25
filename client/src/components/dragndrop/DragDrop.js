@@ -1,8 +1,10 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./dragDrop.css";
+import axios from "axios";
 
+const baseUrl = "http://localhost:2000/api/v1/";
 
-export default function DragDrop({data}) {
+export default function DragDrop({ data }) {
   const [list, setList] = useState(data);
   const [dragging, setDragging] = useState(false);
 
@@ -51,6 +53,22 @@ export default function DragDrop({data}) {
     }
     return "dnd-item";
   };
+
+  const getAllWorkflows = () => {
+    axios
+      .get(baseUrl + "tasks/")
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  useEffect(() => {
+    //get all workflows
+    getAllWorkflows();
+  }, []);
 
   return (
     <header className="App-header">

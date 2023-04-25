@@ -7,8 +7,6 @@ import axios from "axios";
 import jwt from "jwt-decode";
 import TaskStateModal from "./Modals/TaskStateModal";
 import ErrorModal from "./Modals/ErrorModal";
-import UncontrolledBoard from "./UncontrolledBoard";
-import { ControlledBoard } from "./ControlledBoard";
 import DragDrop from "./dragndrop/DragDrop";
 
 const baseUrl = "http://localhost:2000/api/v1/";
@@ -124,7 +122,13 @@ export default function Tasks({ role }) {
     <>
       <DragDrop data={data} />
 
-      {role !== "supervisor" && (
+      <ErrorModal
+        isErrorModalOpen={isErrorModalOpen}
+        setIsErrorModalOpen={setIsErrorModalOpen}
+        error={error}
+      />
+
+      {/* {role !== "supervisor" && (
         <Modal
           title="Select Task State"
           open={isModalOpen}
@@ -148,12 +152,7 @@ export default function Tasks({ role }) {
             Done
           </button>
         </Modal>
-      )}
-      <ErrorModal
-        isErrorModalOpen={isErrorModalOpen}
-        setIsErrorModalOpen={setIsErrorModalOpen}
-        error={error}
-      />
+      )} */}
       {/* {tasks.length === 0 ? (
         <div style={{ display: "flex", justifySelf: "center" }}>
           Tasks is Empty
