@@ -6,18 +6,18 @@ const createTask = async (req, res) => {
     const {
       task_content,
       description,
-      modulname,
+      modulename,
       user_id,
       supervisor,
       task_date,
       deadline,
     } = req.body;
     const newItem = await pool.query(
-      "INSERT_INTO workflow (task_content,description,modulname,user_id,supervisor,task_date,deadline) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING *",
+      "INSERT INTO workflow (task_content,description,modulename,user_id,supervisor,task_date,deadline) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING *",
       [
         task_content,
         description,
-        modulname,
+        modulename,
         user_id,
         supervisor,
         task_date,
@@ -91,11 +91,11 @@ const updateTask = async (req, res) => {
 
 const updateTaskState = async (req, res) => {
   try {
-    const { id, task_state } = req.body;
-    console.log("id:", id, " state:", task_state);
+    const { id, groupname } = req.body;
+
     const updatedTask = await pool.query(
-      "UPDATE workflow SET task_state=$1 WHERE id=$2 RETURNING *",
-      [task_state, id]
+      "UPDATE workflow SET groupname=$1 WHERE id=$2 RETURNING *",
+      [groupname, id]
     );
 
     res.status(200).json({

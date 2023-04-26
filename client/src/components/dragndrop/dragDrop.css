@@ -9,6 +9,7 @@
     color: white;
     overflow-x: hidden;
     overflow-y: auto;
+    min-width: 800px;
 }
 
 .drag-n-drop {
