@@ -2,7 +2,7 @@ import UsersDropDown from "./Menu/UsersDropDown";
 import "./addTask.css";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Col, DatePicker, Divider, Modal, Row, Space } from "antd";
+import { Col, DatePicker, Divider, Input, Modal, Row, Space } from "antd";
 import moment from "moment";
 import jwt from "jwt-decode";
 import ErrorModal from "./Modals/ErrorModal";
@@ -84,6 +84,15 @@ export default function AddTask({ token }) {
         action="#"
         onSubmit={(event) => assignTask(event)}
       >
+        <Divider orientation="left"></Divider>
+        <Row gutter={16}>
+          <Col className="gutter-row" span={12}>
+            <label className="labels">Task Title</label>
+          </Col>
+          <Col className="gutter-row" span={12}>
+            <Input placeholder="Task Title"></Input>
+          </Col>
+        </Row>
         <Divider orientation="left"></Divider>
         <Row gutter={16}>
           <Col className="gutter-row" span={12}>
