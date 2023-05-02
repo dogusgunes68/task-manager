@@ -5,18 +5,19 @@
 import LoginComponent from "./components/LoginPages/LoginComponent";
 import FilterMenu from "./components/Menu/FilterMenu";
 import NavbarMenu from "./components/Menu/NavbarMenu";
-import Tasks from "./components/Tasks";
-import AddTask from "./components/AddTask";
-import { Routes, Route } from "react-router-dom";
-import { AuthProvider, useAuth } from "./components/LoginPages/auth";
-import RequireAuth from "./components/LoginPages/RequireAuth";
+import Tasks from "./components/tasks/Tasks";
+import AddTask from "./components/addtask/AddTask";
+import { AuthProvider } from "./components/LoginPages/auth";
 import { useEffect, useState } from "react";
-import "antd/dist/reset.css";
-import { Button } from "antd";
+//import "antd/dist/reset.css"; //antd version 5+
+import "antd/dist/antd.css"; //antd version 4+
 import jwtDecode from "jwt-decode";
 import io from "socket.io-client";
 import bgLogin from "./components/LoginPages/login-bg.jpg";
-//const socket = io.connect("http://localhost:2000");
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+
+import CustomLayout from "./components/layout/superUser/CustomLayout";
+const socket = io.connect("http://localhost:2001");
 function App() {
   const [token, setToken] = useState(null);
   var user = null;
@@ -31,16 +32,8 @@ function App() {
 
   return (
     <>
-      {/* <InputTodo socket={socket}></InputTodo>
-        <ListTodos socket={socket}></ListTodos> */}
-
-      {/* <NavbarMenu id="header" />
-      <div id="header-content">
-        <FilterMenu />
-        <Tasks /> 
-        <AddTask></AddTask> 
-      </div> */}
-      <AuthProvider>
+      <CustomLayout socket={socket} />
+      {/* <AuthProvider>
         <Routes>
           {token === null ? (
             <Route
@@ -58,7 +51,6 @@ function App() {
                 </div>
               }
             >
-              {/* <Route index element={<Home />} /> */}
             </Route>
           ) : (
             <>
@@ -79,7 +71,7 @@ function App() {
                     />
                     <div id="header-content">
                       <FilterMenu token={token} />
-                      <Tasks role={user.user.role} />
+                      <Tasks role={user.user.role} socket={socket} />
                     </div>
                   </div>
                   // <div>adsdadw</div>
@@ -113,6 +105,7 @@ function App() {
           )}
         </Routes>
       </AuthProvider>
+    */}
     </>
   );
 }

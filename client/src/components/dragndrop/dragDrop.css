@@ -1,5 +1,5 @@
 .App-header {
-    background-color: rgb(70, 69, 69);
+    background-color: #001529;
     min-height: fit-content;
     width: 100%;
     display: flex;
@@ -10,6 +10,8 @@
     overflow-x: hidden;
     overflow-y: auto;
     min-width: 800px;
+    border-radius: 10px;
+        padding: 10px;
 }
 
 .drag-n-drop {
@@ -23,13 +25,14 @@
 }
 
 .dnd-group {
-    background-color: rgb(121, 116, 116);
+    background-color: #455768;
     border-radius: 5px;
     padding: .5rem;
     width: 25%;
 }
 
 .dnd-item {
+    padding: 5px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -38,10 +41,11 @@
     border-radius: 5px;
     color: gray;
     font-weight: bold;
+    margin-top: 7%;
 }
 
 .dnd-item:not(:last-of-type) {
-    margin-bottom: .5rem;
+
 }
 
 .dnd-item * {

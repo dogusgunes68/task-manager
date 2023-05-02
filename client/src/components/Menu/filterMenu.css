@@ -15,21 +15,6 @@
     background-color: black;
 }
 
-h3 {
-    color: white;
-}
-
-ul {
-    list-style-type: none;
-}
-
-ul li {
-    padding: 20px;
-}
-
-ul li:hover {
-    background-color: gray;
-}
 
 #header-content {
     display: flex;

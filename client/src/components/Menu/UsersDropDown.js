@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "./../addTask.css";
+import "./../addtask/addTask.css";
 import axios from "axios";
 
 const baseUrl = "http://localhost:2000/api/v1/";
@@ -34,7 +34,7 @@ function UsersDropDown({ usernames, user, setUser }) {
       <button
         id="user-dropdown-item"
         type="button"
-        className="btn btn-info dropdown-toggle"
+        className="btn btn-dark dropdown-toggle"
         data-toggle="dropdown"
       >
         Select User

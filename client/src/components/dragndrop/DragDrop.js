@@ -1,13 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./dragDrop.css";
 import axios from "axios";
+import { Card, notification } from "antd";
 
 const baseUrl = "http://localhost:2000/api/v1/";
 
-export default function DragDrop({ data }) {
+export default function DragDrop({ socket }) {
   const [dragging, setDragging] = useState(false);
   const [workflow, setWorkflow] = useState([]);
-
+  const [endParams, setEndParams] = useState(null);
   const selectedItemId = useRef();
   const dragItem = useRef();
   const dragNode = useRef();
@@ -31,6 +32,8 @@ export default function DragDrop({ data }) {
       .put(baseUrl + "tasks/update/taskstate/", { id, groupname })
       .then((response) => {
         getAllWorkflows();
+        socket.emit("update_task_state", groupname);
+
         console.log(response.status);
       })
       .catch((err) => {
@@ -63,17 +66,26 @@ export default function DragDrop({ data }) {
       // });
       //update data
       console.log(params.id);
-      updateWorkflowGroup(params.id, groups[params.grpIx]);
       //get all data
     }
   };
 
-  const handleDragEnd = () => {
+  const handleDragEnd = (params) => {
+    console.log("params:", params);
+    setEndParams(params);
     setDragging(false);
     dragNode.current.removeEventListener("dragend", handleDragEnd);
+
     dragItem.current = null;
     dragNode.current = null;
   };
+
+  useEffect(() => {
+    if (dragging === false && endParams !== null) {
+      console.log("end params:", endParams);
+      updateWorkflowGroup(endParams.id, groups[endParams.grpIx]);
+    }
+  }, [dragging]);
 
   const getStyles = (params) => {
     const currentItem = dragItem.current;
@@ -104,7 +116,7 @@ export default function DragDrop({ data }) {
       }
     });
 
-    console.log(listB);
+    //console.log(listB);
     listB = { groupname: "Backlog", items: [...listB] };
     listD = { groupname: "Doing", items: [...listD] };
     listQ = { groupname: "Q&A", items: [...listQ] };
@@ -116,55 +128,108 @@ export default function DragDrop({ data }) {
   useEffect(() => {
     //get all workflows
     getAllWorkflows();
-    console.log(workflow);
   }, []);
 
+  const [api, contextHolder] = notification.useNotification();
+  const openNotification = (data) => {
+    api.info({
+      message: "Notification Title",
+      description: data,
+      duration: 2,
+    });
+  };
+
+  useEffect(() => {
+    socket.on("get_task_state", (groupname) => {
+      if (groupname) openNotification(groupname);
+    });
+  }, [socket]);
+
   return (
-    <header className="App-header">
-      <div className="drag-n-drop">
-        {workflow.map((grp, grpIx) => (
-          <div
-            key={grp.groupname}
-            className="dnd-group"
-            onDragEnter={
-              dragging && !grp.items.length
-                ? (e) => {
-                    handleDragEnter(e, {
-                      grpIx,
-                      itemIx: 0,
-                      id: selectedItemId.current,
-                    });
+    <>
+      {contextHolder}
+      <header className="App-header">
+        <div className="drag-n-drop">
+          {workflow.map((grp, grpIx) => (
+            <div
+              key={grp.groupname}
+              className="dnd-group"
+              onDragEnd={
+                !grp.items.length
+                  ? (e) => {
+                      handleDragEnd({
+                        grpIx,
+                        itemIx: 0,
+                        id: selectedItemId.current,
+                      });
+                    }
+                  : null
+              }
+            >
+              <div className="group-title">{grp.groupname}</div>
+              {grp.items.map((item, itemIx) => (
+                <div
+                  draggable
+                  onDragStart={(e) =>
+                    handleDragStart(e, { grpIx, itemIx, id: item.id })
                   }
-                : null
-            }
-          >
-            <div className="group-title">{grp.groupname}</div>
-            {grp.items.map((item, itemIx) => (
-              <div
-                draggable
-                onDragStart={(e) =>
-                  handleDragStart(e, { grpIx, itemIx, id: item.id })
-                }
-                onDragEnter={
-                  dragging
-                    ? (e) => {
-                        handleDragEnter(e, {
-                          grpIx,
-                          itemIx,
-                          id: selectedItemId.current,
-                        });
-                      }
-                    : null
-                }
-                key={item.task_content}
-                className={dragging ? getStyles({ grpIx, itemIx }) : "dnd-item"}
-              >
-                {item.task_content}
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
-    </header>
+                  onDragEnter={
+                    dragging
+                      ? (e) => {
+                          handleDragEnter(e, {
+                            grpIx,
+                            itemIx,
+                            id: selectedItemId.current,
+                          });
+                        }
+                      : null
+                  }
+                  onDragEnd={(e) =>
+                    handleDragEnd({
+                      grpIx,
+                      itemIx,
+                      id: selectedItemId.current,
+                    })
+                  }
+                  key={item.task_content}
+                  className={
+                    dragging ? getStyles({ grpIx, itemIx }) : "dnd-item"
+                  }
+                >
+                  <Card
+                    title={item.task_content}
+                    bordered={false}
+                    type="inner"
+                    hoverable={true}
+                    style={{
+                      width: 300,
+                    }}
+                  >
+                    <div
+                      style={{
+                        padding: "15px",
+                        backgroundColor:
+                          groups[grpIx] === "Q&A"
+                            ? "yellow"
+                            : groups[grpIx] === "Backlog"
+                            ? "red"
+                            : groups[grpIx] === "Doing"
+                            ? "orange"
+                            : "green",
+                        borderRadius: "5px",
+                      }}
+                    >
+                      <p>Card content</p>
+                      <p>Card content</p>
+                      <p>Card content</p>
+                    </div>
+                  </Card>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </header>
+    </>
   );
 }
