@@ -1,0 +1,10 @@
+.navbar-menu-item {
+    position: absolute !important;
+    right: 0px !important;
+    height: 64px;
+}
+
+.navbar-menu-item:hover {
+   
+    height: 64px;
+}

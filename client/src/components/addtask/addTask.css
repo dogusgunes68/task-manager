@@ -1,0 +1,64 @@
+.add-task-container {
+    width: 90%;
+    height: 70%;
+    min-width: 500px;
+    text-align: center;
+    margin: 50px;
+    height: fit-content;
+    background-color: rgb(156, 155, 154);
+    border-radius: 30px;
+}
+
+#add-task-form {
+    padding: 50px;
+    display: block;
+}
+
+#user-dropdown-item {
+    width: 80%;
+    font-size: 20px;
+}
+
+.labels {
+    padding-top: 8px;
+    font-size: 24px;
+}
+
+.divs {
+    display: flex;
+    width: 300px;
+    margin-top: 20px;
+    justify-content: space-evenly;
+
+}
+
+#date {
+    margin-left: 20px;
+
+}
+
+#task-content {
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+}
+
+#add-task-button {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.reset-button {
+    margin-right: 10px;
+}
+
+.rows {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.assign-btn {
+    font-size: 20px;
+}
