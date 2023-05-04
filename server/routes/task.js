@@ -2,10 +2,10 @@ const router = require("express").Router();
 const taskController = require("../controllers/task");
 const authController = require("../controllers/auth");
 
-router
-  .route("/")
-  .get(taskController.getAllTasks)
-  .post(taskController.createTask);
+router.route("/").post(taskController.createTask);
+
+router.route("/getgrouptasks").post(taskController.getAllTasks);
+router.route("/groups").get(taskController.getAllGroups);
 
 // router
 //   .route("/rangeoftasks/:start/:end/:user_id")

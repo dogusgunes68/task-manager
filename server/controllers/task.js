@@ -36,17 +36,28 @@ const createTask = async (req, res) => {
   }
 };
 
+const getAllGroups = async (req, res) => {
+  try {
+    const groups = await pool.query("SELECT * FROM groups");
+    res.status(200).json({
+      data: groups.rows,
+    });
+  } catch (error) {}
+};
+
 const getAllTasks = async (req, res) => {
   try {
-    const workflow = await pool.query("SELECT * FROM workflow");
+    const groupid = req.body.groupid;
+    console.log(groupid);
+    const workflow = await pool.query(
+      "SELECT * FROM workflow WHERE status = 1 and groupid=$1",
+      [groupid]
+      //"SELECT workflow.*,groups.name as groupname FROM workflow right outer JOIN groups ON workflow.groupid = groups.id WHERE status = 1 or status is null;      "
+    );
 
     res.status(200).json({
       status: "success",
-      data: [
-        {
-          workflow: workflow.rows,
-        },
-      ],
+      data: workflow.rows,
     });
   } catch (error) {
     res.status(500).json({
@@ -91,11 +102,11 @@ const updateTask = async (req, res) => {
 
 const updateTaskState = async (req, res) => {
   try {
-    const { id, groupname } = req.body;
+    const { id, groupid } = req.body;
 
     const updatedTask = await pool.query(
-      "UPDATE workflow SET groupname=$1 WHERE id=$2 RETURNING *",
-      [groupname, id]
+      "UPDATE workflow SET groupid=$1 WHERE id=$2 RETURNING *",
+      [groupid, id]
     );
 
     res.status(200).json({
@@ -170,4 +181,5 @@ module.exports = {
   getTaskThroughoutRangeAndTasksCount,
   getTasksCount,
   updateTaskState,
+  getAllGroups,
 };
