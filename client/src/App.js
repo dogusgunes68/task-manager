@@ -17,8 +17,9 @@ import bgLogin from "./components/LoginPages/login-bg.jpg";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 
 import CustomLayout from "./components/layout/superUser/CustomLayout";
-const socket = io.connect("http://localhost:2001");
+const socket = io.connect("http://192.168.1.74:2001");
 function App() {
+  //create token to test
   const [token, setToken] = useState(null);
   var user = null;
   if (token !== null) {
@@ -27,17 +28,15 @@ function App() {
   useEffect(() => {
     const token = sessionStorage.getItem("token");
     token ? setToken(token) : setToken(token);
-    //console.log("app token", token);
   }, [token]);
 
   return (
     <>
-      <CustomLayout socket={socket} />
-      {/* <AuthProvider>
+      <AuthProvider>
         <Routes>
           {token === null ? (
             <Route
-              path="/"
+              path="*"
               element={
                 <div
                   style={{
@@ -50,62 +49,25 @@ function App() {
                   <LoginComponent setToken={setToken} />
                 </div>
               }
-            >
-            </Route>
+            ></Route>
           ) : (
-            <>
-              <Route
-                path="/"
-                element={
-                  <div
-                    style={{
-                      display: "block",
-                      textAlign: "center",
-                      height: "100vh",
-                    }}
-                  >
-                    <NavbarMenu
-                      id="header"
-                      name={user.user.username}
-                      setToken={setToken}
-                    />
-                    <div id="header-content">
-                      <FilterMenu token={token} />
-                      <Tasks role={user.user.role} socket={socket} />
-                    </div>
-                  </div>
-                  // <div>adsdadw</div>
-                }
-              ></Route>
-              {user && user.user.role === "supervisor" && (
-                <Route
-                  path="addtask"
-                  element={
-                    <div
-                      style={{
-                        display: "block",
-                        textAlign: "center",
-                        height: "100vh",
-                      }}
-                    >
-                      <NavbarMenu
-                        id="header"
-                        name={user.user.username}
-                        setToken={setToken}
-                      />
-                      <div id="header-content">
-                        <FilterMenu token={token} />
-                        <AddTask token={token} />
-                      </div>
-                    </div>
-                  }
-                />
-              )}
-            </>
+            <Route
+              path="*"
+              element={
+                <div
+                  style={{
+                    display: "block",
+                    textAlign: "center",
+                    height: "100vh",
+                  }}
+                >
+                  <CustomLayout socket={socket} token={token} />
+                </div>
+              }
+            ></Route>
           )}
         </Routes>
       </AuthProvider>
-    */}
     </>
   );
 }

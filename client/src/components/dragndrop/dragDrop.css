@@ -56,7 +56,7 @@
 .group-title {
     display: flex;
     justify-content: center;
-    margin: .5rem;
+    margin: 5px;
 }
 
 .current {

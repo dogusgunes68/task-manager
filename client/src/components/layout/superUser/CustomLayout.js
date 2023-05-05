@@ -19,13 +19,14 @@ import axios from "axios";
 import { BrowserRouter, Routes, Route, Link, NavLink } from "react-router-dom";
 import AddTask from "../../addtask/AddTask";
 import Routing from "../../routing/Routing";
+import jwtDecode from "jwt-decode";
 
-const baseUrl = "http://localhost:2000/api/v1/";
+const baseUrl = "http://192.168.1.74:2000/api/v1/";
 
 function getItem(label, key, icon, children) {
   const link =
     label === "Option 1"
-      ? "http://localhost:3000/"
+      ? "http://localhost:3000/tasks"
       : label === "Option 2"
       ? "http://localhost:3000/addtask"
       : "";
@@ -46,13 +47,15 @@ var items = [
     getItem("Team 1", "6"),
     getItem("Team 2", "8"),
   ]),
-  getItem("Files", "9", <FileOutlined />),
+  getItem("Files", "7", <FileOutlined />),
 ];
 
-export default function CustomLayout({ socket }) {
+export default function CustomLayout({ socket, token }) {
   const [collapsed, setCollapsed] = useState(false);
   const [notificationClicked, setNotificationClicked] = useState(false);
   const [usernames, setUsernames] = useState([]);
+  const [data, setData] = useState([]);
+  let user = jwtDecode(token);
 
   const getUsernames = () => {
     axios
@@ -65,6 +68,7 @@ export default function CustomLayout({ socket }) {
             key: index,
           });
         });
+        user.user.role === "user" && items.pop(1);
         console.log("items:", items);
         setUsernames(items);
       })
@@ -77,6 +81,46 @@ export default function CustomLayout({ socket }) {
     getUsernames();
   }, []);
 
+  // {user && user.user.role === "supervisor" && (
+  //   <Route
+  //     path="addtask"
+  //     element={
+  //       <div
+  //         style={{
+  //           display: "block",
+  //           textAlign: "center",
+  //           height: "100vh",
+  //         }}
+  //       >
+  //         <NavbarMenu
+  //           id="header"
+  //           name={user.user.username}
+  //           setToken={setToken}
+  //         />
+  //         <div id="header-content">
+  //           <FilterMenu token={token} />
+  //           <AddTask token={token} />
+  //         </div>
+  //       </div>
+  //     }
+  //   />
+  // )}
+
+  const loadData = () => {
+    axios
+      .get(baseUrl + "notification/" + user.user.id)
+      .then((body) => {
+        setData(body.data.data);
+      })
+      .catch(() => {});
+  };
+  useEffect(() => {
+    loadData();
+    socket.on("get_notifications", () => {
+      console.log("user:", user);
+      loadData();
+    });
+  }, [socket]);
   return (
     <>
       <Layout
@@ -100,18 +144,25 @@ export default function CustomLayout({ socket }) {
             }}
           >
             <Navbar
+              taskCount={data.length}
               notificationClicked={notificationClicked}
               setNotificationClicked={setNotificationClicked}
             />
             {/* navbar */}
           </Header>
-          {notificationClicked === true && <NotificationDrawer />}
+          {notificationClicked === true && (
+            <NotificationDrawer
+              loadData={loadData}
+              socket={socket}
+              user={user}
+            />
+          )}
           <Content
             style={{
               margin: "0 16px",
             }}
           >
-            <Routing socket={socket} />
+            <Routing token={token} socket={socket} />
           </Content>
           <Footer
             style={{

@@ -2,32 +2,12 @@ import { Avatar, Divider, List, Skeleton } from "antd";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
+const baseUrl = "http://192.168.1.74:2000/api/v1/";
 
-function NotificationDrawer() {
+function NotificationDrawer({ user, socket, loadData }) {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
 
-  const loadMoreData = () => {
-    if (loading) {
-      return;
-    }
-    setLoading(true);
-    axios
-      .get(
-        "https://randomuser.me/api/?results=10&inc=name,gender,email,nat,picture&noinfo"
-      )
-      .then((res) => res.json())
-      .then((body) => {
-        setData([...data, ...body.results]);
-        setLoading(false);
-      })
-      .catch(() => {
-        setLoading(false);
-      });
-  };
-  useEffect(() => {
-    loadMoreData();
-  }, []);
   return (
     <div
       id="scrollableDiv"
@@ -45,7 +25,7 @@ function NotificationDrawer() {
     >
       <InfiniteScroll
         dataLength={data.length}
-        next={loadMoreData}
+        next={loadData}
         hasMore={data.length < 50}
         loader={<Skeleton avatar paragraph={{ rows: 1 }} active />}
         endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
@@ -54,11 +34,15 @@ function NotificationDrawer() {
         <List
           dataSource={data}
           renderItem={(item) => (
-            <List.Item key={item.email}>
+            <List.Item key={item.id}>
               <List.Item.Meta
-                avatar={<Avatar src={item.picture.large} />}
-                title={<a href="https://ant.design">{item.name.last}</a>}
-                description={item.email}
+                avatar={
+                  <Avatar
+                    style={{ backgroundColor: item.read ? "gray" : "red" }}
+                  />
+                }
+                title={<a href="https://ant.design">{item.task_content}</a>}
+                description={item.description}
               />
               <div>Content</div>
             </List.Item>

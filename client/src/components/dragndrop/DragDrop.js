@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./dragDrop.css";
 import axios from "axios";
-import { Card, notification } from "antd";
+import { Card, Divider, notification } from "antd";
 
-const baseUrl = "http://localhost:2000/api/v1/";
+const baseUrl = "http://192.168.1.74:2000/api/v1/";
 
 export default function DragDrop({ socket }) {
   const [dragging, setDragging] = useState(false);
@@ -122,29 +122,13 @@ export default function DragDrop({ socket }) {
               onDragOver={() => (dragNode.current = grp.id)}
             >
               <div className="group-title">{grp.name}</div>
+              <Divider />
               {grp.items &&
                 grp.items.map((item, itemIx) => (
                   <div
                     draggable
                     onDragStart={(e) => handleDragStart(e, item)}
-                    // onDragEnter={
-                    //   dragging
-                    //     ? (e) => {
-                    //         handleDragEnter(e, {
-                    //           grpIx,
-                    //           itemIx,
-                    //           id: selectedItemId.current,
-                    //         });
-                    //       }
-                    //     : null
-                    // }
-                    // onDragEnd={(e) =>
-                    //   handleDragEnd({
-                    //     grpIx,
-                    //     itemIx,
-                    //     id: selectedItemId.current,
-                    //   })
-                    // }
+                    // onDragEnter=
                     key={item.task_content}
                     className={dragging ? getStyles() : "dnd-item"}
                   >
@@ -171,9 +155,7 @@ export default function DragDrop({ socket }) {
                           borderRadius: "5px",
                         }}
                       >
-                        <p>Card content</p>
-                        <p>Card content</p>
-                        <p>Card content</p>
+                        <p>{item.description}</p>
                       </div>
                     </Card>
                   </div>

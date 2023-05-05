@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./../addtask/addTask.css";
 import axios from "axios";
 
-const baseUrl = "http://localhost:2000/api/v1/";
+const baseUrl = "http://192.168.1.74:2000/api/v1/";
 
 function UsersDropDown({ usernames, user, setUser }) {
   const [selectedUser, setSelectedUser] = useState("Select User");

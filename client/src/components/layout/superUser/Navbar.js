@@ -3,14 +3,11 @@ import { NotificationFilled } from "@ant-design/icons";
 import React, { useState } from "react";
 import "./navbar.css";
 
-export default function Navbar({
-  notificationClicked,
-  setNotificationClicked,
-}) {
+export default function Navbar({ notificationClicked, setNotificationClicked, taskCount }) {
   const list = [
     "nav1",
     "nav2",
-    <Badge count={100} style={{ fontSize: "10px" }} size="small">
+    <Badge count={taskCount} style={{ fontSize: "10px" }} size="small">
       <NotificationFilled
         style={{
           fontSize: "26px",

@@ -16,7 +16,7 @@ export default function RegisterComponent({ setToken }) {
 
   const navigate = useNavigate();
 
-  const baseUrl = "http://localhost:2000/api/v1/";
+  const baseUrl = "http://192.168.1.74:2000/api/v1/";
 
   const register = (event) => {
     event.preventDefault();

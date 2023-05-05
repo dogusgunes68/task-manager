@@ -4,7 +4,7 @@ import jwt from "jwt-decode";
 import ErrorModal from "../Modals/ErrorModal";
 import DragDrop from "../dragndrop/DragDrop";
 
-const baseUrl = "http://localhost:2000/api/v1/";
+const baseUrl = "http://192.168.1.74:2000/api/v1/";
 const data = [
   { title: "Backlog", items: ["1", "2", "3"] },
   { title: "Doing", items: ["4", "5", "6"] },

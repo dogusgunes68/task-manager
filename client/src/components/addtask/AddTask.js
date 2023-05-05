@@ -7,9 +7,9 @@ import moment from "moment";
 import jwt from "jwt-decode";
 import ErrorModal from "../Modals/ErrorModal";
 
-const baseUrl = "http://localhost:2000/api/v1/";
+const baseUrl = "http://192.168.1.74:2000/api/v1/";
 
-export default function AddTask({ token }) {
+export default function AddTask({ token, socket }) {
   const date = new Date(Date.now());
   const currentDate = JSON.stringify(date).slice(1, 11);
 
@@ -23,7 +23,6 @@ export default function AddTask({ token }) {
   const showErrorModal = () => {
     setIsErrorModalOpen(true);
   };
-
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -41,9 +40,10 @@ export default function AddTask({ token }) {
   }
 
   useEffect(() => {
+    console.log(token);
     axios.get(baseUrl + "user/usernames").then((response) => {
       setUsernames(response.data.data.usernames);
-      console.log("username:", response.data.data.usernames);
+      //console.log("username:", response.data.data.usernames);
     });
   }, []);
 
@@ -53,32 +53,37 @@ export default function AddTask({ token }) {
     }
   }, [error]);
 
-  useEffect(() => {
-    console.log("user:", user);
-    if (Object.keys(user).length !== 0) {
+  const createTask = (data) => {
+    //console.log("user:", user);
+    if (Object.keys(data).length !== 0) {
+      console.log("user:", data);
       axios
-        .post(baseUrl + "tasks", user)
+        .post(baseUrl + "tasks", data)
         .then((response) => {
-          console.log("eklendi:", response);
+          //console.log("eklendi:", response);
+
+          //socket.emit("create_notification", user);
+          
+          socket.emit("create_notification");
           showModal();
         })
         .catch((err) => {
           setError(err);
         });
     }
-  }, [post]);
+  };
 
   const assignTask = (event) => {
     event.preventDefault();
-
     const supervisor = jwt(token);
     //console.log("event:", event);
     console.log("supervisor:", supervisor.user);
-    setUser({
+    const data = {
       ...user,
       task_date: new Date(Date.now()),
       supervisor: supervisor.user.id,
-    });
+    };
+    setUser(data);
     if (
       Object.keys(user).length &&
       user.task_content.length !== 0 &&
@@ -86,7 +91,7 @@ export default function AddTask({ token }) {
       user.modulename.length !== 0 &&
       user.deadline !== null
     ) {
-      setPost(Math.random() * Math.random());
+      createTask(data);
     } else {
       setError(new Error("Tüm alanlar doldurulmalıdır."));
       console.log("errorrrrrr");

@@ -18,7 +18,7 @@ export default function SignUpComponent({ setToken }) {
   const auth = useAuth();
   const location = useLocation();
 
-  const baseUrl = "http://localhost:2000/api/v1/";
+  const baseUrl = "http://192.168.1.74:2000/api/v1/";
 
   const redirectPath = location.state?.path || "/";
 
