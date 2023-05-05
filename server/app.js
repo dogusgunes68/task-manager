@@ -23,9 +23,11 @@ app.use(
 const authRoutes = require("./routes/auth");
 const todoRoutes = require("./routes/task");
 const userRoutes = require("./routes/user");
+const notificationRoutes = require("./routes/notification");
 app.use("/api/v1/tasks/", todoRoutes);
 app.use("/api/v1/auth/", authRoutes);
 app.use("/api/v1/user/", userRoutes);
+app.use("/api/v1/notification/", notificationRoutes);
 
 httpServer.listen(2000, () => {
   console.log(`Server has started on port 2000`);

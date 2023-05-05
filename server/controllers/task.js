@@ -1,5 +1,6 @@
 const pool = require("../db/db");
 const User = require("./../models/User");
+const notification = require("./notification");
 
 const createTask = async (req, res) => {
   try {
@@ -23,6 +24,10 @@ const createTask = async (req, res) => {
         task_date,
         deadline,
       ]
+    );
+    const notification = await pool.query(
+      "INSERT INTO notifications(title,content,date,user_id) VALUES($1,$2,$3,$4)",
+      [task_content, description, task_date, user_id]
     );
     res.status(201).json({
       status: "success",
