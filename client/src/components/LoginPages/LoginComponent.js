@@ -1,12 +1,38 @@
 import { useState } from "react";
 import SignUpComponent from "./SignInComponent";
 import RegisterComponent from "./RegisterComponent";
+import SignInComponent from "./SignInComponent";
+import { AndroidOutlined, AppleOutlined } from "@ant-design/icons";
+import { Tabs } from "antd";
+
 function LoginComponent({ setToken }) {
   const [isLogin, setIsLogin] = useState(true);
 
   return (
     <div className="login-container">
-      <div className="login-buttons-container">
+      <Tabs
+        style={{ alignItems: "center" }}
+        defaultActiveKey="1"
+        items={[AppleOutlined, AndroidOutlined].map((Icon, i) => {
+          const id = String(i + 1);
+          return {
+            label: (
+              <span>
+                <Icon />
+                {id === "1" ? "Login" : "Register"}
+              </span>
+            ),
+            key: id,
+            children:
+              id === "1" ? (
+                <SignInComponent setToken={setToken} />
+              ) : (
+                <RegisterComponent setToken={setToken} />
+              ),
+          };
+        })}
+      />
+      {/* <div className="login-buttons-container">
         <button
           className="btn login-buttons-top"
           onClick={() => {
@@ -29,7 +55,7 @@ function LoginComponent({ setToken }) {
         <SignUpComponent setToken={setToken} />
       ) : (
         <RegisterComponent setToken={setToken} />
-      )}
+      )} */}
     </div>
   );
 }

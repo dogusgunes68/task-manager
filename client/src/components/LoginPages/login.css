@@ -1,8 +1,9 @@
 .center {
+    width: 100%;
     margin: auto;
     display: flex;
     justify-content: center;
-    text-align: center;
+    align-items: center;
 }
 
 .login-input {
@@ -62,4 +63,17 @@
     border-radius: 10px;
     background-color: beige;
     text-align: center;
+}
+.ant-tabs-content-holder {
+    width: 100%;
+    align-items: center;
+}
+
+.register-form {
+    width: 100%;
+    padding: 30px;
+}
+
+.register-form input {
+    border-radius: 5px;
 }

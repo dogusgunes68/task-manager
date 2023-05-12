@@ -2,9 +2,10 @@ import { Avatar, Divider, List, Skeleton } from "antd";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
+import "./notification.css";
 const baseUrl = "http://192.168.1.74:2000/api/v1/";
 
-function NotificationDrawer({ user, socket, loadData }) {
+function NotificationDrawer({ user, socket, datas }) {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
 
@@ -16,6 +17,7 @@ function NotificationDrawer({ user, socket, loadData }) {
         overflow: "auto",
         padding: "0 16px",
         border: "1px solid rgba(140, 140, 140, 0.35)",
+        backgroundColor: "white",
         position: "absolute",
         right: 0,
         top: 64,
@@ -24,15 +26,16 @@ function NotificationDrawer({ user, socket, loadData }) {
       }}
     >
       <InfiniteScroll
-        dataLength={data.length}
-        next={loadData}
+        dataLength={datas.length}
+        next={datas}
         hasMore={data.length < 50}
         loader={<Skeleton avatar paragraph={{ rows: 1 }} active />}
         endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
         scrollableTarget="scrollableDiv"
       >
         <List
-          dataSource={data}
+          className="not-drawer"
+          dataSource={datas}
           renderItem={(item) => (
             <List.Item key={item.id}>
               <List.Item.Meta
@@ -41,10 +44,10 @@ function NotificationDrawer({ user, socket, loadData }) {
                     style={{ backgroundColor: item.read ? "gray" : "red" }}
                   />
                 }
-                title={<a href="https://ant.design">{item.task_content}</a>}
-                description={item.description}
+                title={<a href="https://ant.design">{}</a>}
+                description={item.content}
               />
-              <div>Content</div>
+              <div>{item.title}</div>
             </List.Item>
           )}
         />

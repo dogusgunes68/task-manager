@@ -2,35 +2,53 @@ import React, { useEffect, useRef, useState } from "react";
 import "./dragDrop.css";
 import axios from "axios";
 import { Card, Divider, notification } from "antd";
+import FilterSearch from "../filter/FilterSearch";
 
 const baseUrl = "http://192.168.1.74:2000/api/v1/";
 
-export default function DragDrop({ socket }) {
+export default function DragDrop({ socket, username }) {
   const [dragging, setDragging] = useState(false);
-  const [workflow, setWorkflow] = useState([]);
-  const [endParams, setEndParams] = useState(null);
-  const selectedItemId = useRef();
   const dragItem = useRef();
   const dragNode = useRef();
   const [groups, setGroups] = useState([]);
 
   //const groups = ["Backlog", "Doing", "Q&A", "Production"];
-
   const getGroupTasks = (data) => {
-    data.forEach((element) => {
-      axios
-        .post(baseUrl + `tasks/getgrouptasks`, { groupid: element.id })
-        .then((response2) => {
-          setGroups((e) =>
-            e.map((x) => {
-              if (x.id === element.id) {
-                return { ...x, items: response2.data.data };
-              }
-              return { ...x, items: x.items ? x.items : [] };
+    username === "All Users"
+      ? data.forEach((element) => {
+          axios
+            .post(baseUrl + `tasks/getgrouptasks`, { groupid: element.id })
+            .then((response2) => {
+              setGroups((e) =>
+                e.map((x) => {
+                  if (x.id === element.id) {
+                    return { ...x, items: response2.data.data };
+                  }
+                  return { ...x, items: x.items ? x.items : [] };
+                })
+              );
+            });
+        })
+      : data.forEach((element) => {
+          axios
+            .post(baseUrl + `tasks/getgrouptasksbyusername`, {
+              groupid: element.id,
+              username,
             })
-          );
+            .then((response2) => {
+              setGroups((e) =>
+                e.map((x) => {
+                  if (x.id === element.id) {
+                    return { ...x, items: response2.data.data };
+                  }
+                  return { ...x, items: x.items ? x.items : [] };
+                })
+              );
+            })
+            .catch((err) => {
+              console.error(err);
+            });
         });
-    });
   };
 
   const getAllGroups = () => {
@@ -43,13 +61,19 @@ export default function DragDrop({ socket }) {
     });
   };
 
+  useEffect(() => {
+    //get all workflows
+    getAllGroups();
+  }, [username]);
+
   const handleDragStart = (e, params) => {
     dragItem.current = params;
+    //setDragging(true);
   };
 
   const handleDragEnd = () => {
     console.log(dragItem, dragNode);
-
+    //setDragging(false);
     axios
       .put(baseUrl + "tasks/update/taskstate/", {
         id: dragItem.current.id,
@@ -58,20 +82,12 @@ export default function DragDrop({ socket }) {
       .then((response) => {
         getAllGroups();
         //socket.emit("update_task_state", groupname);
-
         console.log(response.status);
       })
       .catch((err) => {
         console.log(err);
       });
   };
-
-  // useEffect(() => {
-  //   if (dragging === false && endParams !== null) {
-  //     console.log("end params:", endParams);
-
-  //   }
-  // }, [dragging]);
 
   const getStyles = () => {
     const currentItem = dragItem.current;
@@ -83,11 +99,6 @@ export default function DragDrop({ socket }) {
     }
     return "dnd-item";
   };
-
-  useEffect(() => {
-    //get all workflows
-    getAllGroups();
-  }, []);
 
   const [api, contextHolder] = notification.useNotification();
   const openNotification = (data) => {
@@ -107,6 +118,8 @@ export default function DragDrop({ socket }) {
   return (
     <>
       {contextHolder}
+      <FilterSearch groups={groups} setGroups={setGroups} />
+
       <header className="App-header">
         <div className="drag-n-drop">
           {/* <div className="dnd-group">

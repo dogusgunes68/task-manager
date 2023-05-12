@@ -25,10 +25,12 @@ const baseUrl = "http://192.168.1.74:2000/api/v1/";
 
 function getItem(label, key, icon, children) {
   const link =
-    label === "Option 1"
+    label === "All Users"
       ? "http://localhost:3000/tasks"
-      : label === "Option 2"
+      : label === "Add Task"
       ? "http://localhost:3000/addtask"
+      : label === "Add User"
+      ? "http://localhost:3000/adduser"
       : "";
 
   return {
@@ -40,35 +42,56 @@ function getItem(label, key, icon, children) {
 }
 
 var items = [
-  getItem("Option 1", "1", <PieChartOutlined />),
-  getItem("Option 2", "2", <DesktopOutlined />),
-  getItem("User", "sub1", <UserOutlined />, []),
-  getItem("Team", "sub2", <TeamOutlined />, [
-    getItem("Team 1", "6"),
-    getItem("Team 2", "8"),
-  ]),
-  getItem("Files", "7", <FileOutlined />),
+  // getItem("Option 1", "1", <PieChartOutlined />),
+  // getItem("Option 2", "2", <DesktopOutlined />),
+  // getItem("User", "sub1", <UserOutlined />, []),
+  // getItem("Add User", "3", <UserOutlined />),
+  // getItem("Team", "sub2", <TeamOutlined />, [
+  //   getItem("Team 1", "6"),
+  //   getItem("Team 2", "8"),
+  // ]),
+  // getItem("Files", "7", <FileOutlined />),
 ];
 
 export default function CustomLayout({ socket, token }) {
+  let user = jwtDecode(token);
+  const [selectedUsername, setSelectedUsername] = useState("");
+
+  let isAdmin = user.user.role === "admin";
+  if (items.length === 0) {
+    if (isAdmin) {
+      items.push(getItem("Add User", "3", <UserOutlined />));
+    } else {
+      items.push(getItem("All Users", "All Users", <PieChartOutlined />));
+      items.push(getItem("Add Task", "2", <DesktopOutlined />));
+      items.push(getItem("User", "sub1", <UserOutlined />, []));
+      items.push(getItem("Files", "7", <FileOutlined />));
+    }
+
+    // items.push(getItem("Team", "sub2", <TeamOutlined />, [
+    //   getItem("Team 1", "6"),
+    //   getItem("Team 2", "8"),
+    // ]))
+  }
   const [collapsed, setCollapsed] = useState(false);
   const [notificationClicked, setNotificationClicked] = useState(false);
   const [usernames, setUsernames] = useState([]);
   const [data, setData] = useState([]);
-  let user = jwtDecode(token);
 
   const getUsernames = () => {
     axios
       .get(baseUrl + "user/usernames")
       .then((response) => {
         console.log("usernames:", response.data.data.usernames);
-        response.data.data.usernames.map((username, index) => {
-          return (items[2].children[index] = {
-            label: response.data.data.usernames[index].username,
-            key: index,
+        if (!isAdmin) {
+          response.data.data.usernames.map((_, index) => {
+            const username = response.data.data.usernames[index].username;
+            return (items[2].children[index] = {
+              label: <NavLink to="/tasks">{username}</NavLink>,
+              key: username,
+            });
           });
-        });
-        user.user.role === "user" && items.pop(1);
+        }
         console.log("items:", items);
         setUsernames(items);
       })
@@ -121,6 +144,7 @@ export default function CustomLayout({ socket, token }) {
       loadData();
     });
   }, [socket]);
+  // console.log(selectedUsername);
   return (
     <>
       <Layout
@@ -133,7 +157,11 @@ export default function CustomLayout({ socket, token }) {
           collapsed={collapsed}
           onCollapse={(value) => setCollapsed(value)}
         >
-          <LeftMenu items={usernames} socket={socket} />{" "}
+          <LeftMenu
+            setSelectedUsername={setSelectedUsername}
+            items={usernames}
+            socket={socket}
+          />{" "}
           {/* sider menu(left side) */}
         </Sider>
         <Layout className="site-layout">
@@ -151,18 +179,18 @@ export default function CustomLayout({ socket, token }) {
             {/* navbar */}
           </Header>
           {notificationClicked === true && (
-            <NotificationDrawer
-              loadData={loadData}
-              socket={socket}
-              user={user}
-            />
+            <NotificationDrawer datas={data} socket={socket} user={user} />
           )}
           <Content
             style={{
               margin: "0 16px",
             }}
           >
-            <Routing token={token} socket={socket} />
+            <Routing
+              selectedUsername={selectedUsername}
+              token={token}
+              socket={socket}
+            />
           </Content>
           <Footer
             style={{

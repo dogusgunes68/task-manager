@@ -4,6 +4,7 @@ import axios from "axios";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "./auth";
 import ErrorModal from "../Modals/ErrorModal";
+import { Button, Form, Input } from "antd";
 
 export default function SignUpComponent({ setToken }) {
   const [email, setEmail] = useState("");
@@ -42,9 +43,65 @@ export default function SignUpComponent({ setToken }) {
       });
   };
 
+  const [form] = Form.useForm();
+  const [formLayout, setFormLayout] = useState("horizontal");
+  const onFormLayoutChange = ({ layout }) => {
+    setFormLayout(layout);
+  };
+  const formItemLayout =
+    formLayout === "horizontal"
+      ? {
+          labelCol: {
+            span: 4,
+          },
+          wrapperCol: {
+            span: 14,
+          },
+        }
+      : null;
+  const buttonItemLayout =
+    formLayout === "horizontal"
+      ? {
+          wrapperCol: {
+            span: 14,
+            offset: 4,
+          },
+        }
+      : null;
+
   return (
     <div className="center">
-      <form className="login-forms" onSubmit={(e) => login(e)}>
+      <Form
+        className="register-form"
+        {...formItemLayout}
+        layout={formLayout}
+        form={form}
+        initialValues={{
+          layout: formLayout,
+        }}
+        onValuesChange={onFormLayoutChange}
+      >
+        <Form.Item label="E-mail">
+          <Input
+            type="email"
+            placeholder="E-mail"
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </Form.Item>
+        <Form.Item label="Password">
+          <Input
+            type="password"
+            placeholder="Password"
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </Form.Item>
+        <Form.Item {...buttonItemLayout}>
+          <Button onClick={login} type="primary">
+            Login
+          </Button>
+        </Form.Item>
+      </Form>
+      {/* <form className="login-forms" onSubmit={(e) => login(e)}>
         <input
           className="login-input"
           type="email"
@@ -65,7 +122,7 @@ export default function SignUpComponent({ setToken }) {
         isErrorModalOpen={isErrorModalOpen}
         setIsErrorModalOpen={setIsErrorModalOpen}
         error={error}
-      />
+      /> */}
     </div>
   );
 }

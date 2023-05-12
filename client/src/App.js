@@ -43,7 +43,8 @@ function App() {
                     display: "flex",
                     justifyContent: "center",
                     height: "100vh",
-                    backgroundImage: `url(${bgLogin})`,
+                    backgroundColor: "gray",
+                    //backgroundImage: `url(${bgLogin})`,
                   }}
                 >
                   <LoginComponent setToken={setToken} />

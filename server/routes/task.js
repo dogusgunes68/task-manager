@@ -5,6 +5,7 @@ const authController = require("../controllers/auth");
 router.route("/").post(taskController.createTask);
 
 router.route("/getgrouptasks").post(taskController.getAllTasks);
+router.route("/getgrouptasksbyusername").post(taskController.getTasksByUser);
 router.route("/groups").get(taskController.getAllGroups);
 
 // router

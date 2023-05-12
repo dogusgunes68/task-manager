@@ -29,6 +29,7 @@ const createTask = async (req, res) => {
       "INSERT INTO notifications(title,content,date,user_id) VALUES($1,$2,$3,$4)",
       [task_content, description, task_date, user_id]
     );
+
     res.status(201).json({
       status: "success",
       message: [newItem.rows],
@@ -70,6 +71,39 @@ const getAllTasks = async (req, res) => {
     });
   }
 };
+
+async function getUserIdByUsername(username) {
+  //console.log(groupid);
+  const id = await pool.query(
+    "SELECT id FROM users WHERE username=$1",
+    [username]
+    //"SELECT workflow.*,groups.name as groupname FROM workflow right outer JOIN groups ON workflow.groupid = groups.id WHERE status = 1 or status is null;      "
+  );
+
+  return id.rows[0].id;
+}
+
+async function getTasksByUser(req, res) {
+  try {
+    const { groupid, username } = req.body;
+    const user_id = await getUserIdByUsername(username);
+    console.log("id:", user_id);
+    const workflow = await pool.query(
+      "SELECT * FROM workflow WHERE status = 1 and groupid=$1 and user_id=$2",
+      [groupid, user_id]
+      //"SELECT workflow.*,groups.name as groupname FROM workflow right outer JOIN groups ON workflow.groupid = groups.id WHERE status = 1 or status is null;      "
+    );
+
+    res.status(200).json({
+      status: "success",
+      data: workflow.rows,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: `${error.message}`,
+    });
+  }
+}
 
 const deleteTask = async (req, res) => {
   try {
@@ -187,4 +221,5 @@ module.exports = {
   getTasksCount,
   updateTaskState,
   getAllGroups,
+  getTasksByUser,
 };

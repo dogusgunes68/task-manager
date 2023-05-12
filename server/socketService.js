@@ -15,15 +15,15 @@ const io = new Server(httpServer, {
 
 io.on("connection", (client) => {
   console.log("connected,", client.id);
-  client.on("update_task_state", (groupname) => {
-    //update task state
-    //console.log(groupname);
-    io.emit("get_task_state", groupname);
-  });
+  // client.on("update_task_state", (groupname) => {
+  //   //update task state
+  //   //console.log(groupname);
+  //   io.emit("get_task_state", groupname);
+  // });
 
   client.on("create_notification", () => {
     //create notification and send notification
-    console.log("crt not");
+    //console.log("crt not");
     io.emit("get_notifications");
   });
 });
