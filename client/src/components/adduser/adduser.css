@@ -1,0 +1,27 @@
+.forms {
+    background-color: gray;
+    margin: 100px;
+    padding: 100px;
+    border-radius: 10px;
+    text-align: center;
+    width: 800px;
+}
+
+.forms input {
+    margin-left: 10px;
+    border-radius: 5px;
+}
+
+.forms button {
+    background-color: black;
+    border-radius: 5px;
+    width: 120px;
+    height: 40px;
+    font-size: 14px;
+    color: white;
+}
+
+.forms label {
+    color: white;
+    font-weight: bold;
+}
