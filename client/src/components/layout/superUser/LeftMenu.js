@@ -14,7 +14,7 @@ export default function LeftMenu({ items, socket, setSelectedUsername }) {
       <div className="logo" />
       <Menu
         theme="dark"
-        defaultSelectedKeys={["1"]}
+        defaultSelectedKeys={["All Users"]}
         mode="inline"
         items={items}
         onClick={({ key, keyPath, domEvent }) => {

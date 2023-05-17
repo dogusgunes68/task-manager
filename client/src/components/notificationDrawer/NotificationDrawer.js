@@ -13,7 +13,7 @@ function NotificationDrawer({ user, socket, datas }) {
     <div
       id="scrollableDiv"
       style={{
-        height: 400,
+        height: "fit-content",
         overflow: "auto",
         padding: "0 16px",
         border: "1px solid rgba(140, 140, 140, 0.35)",
@@ -22,36 +22,26 @@ function NotificationDrawer({ user, socket, datas }) {
         right: 0,
         top: 64,
         width: 300,
-        height: 300,
+        zIndex: 1,
       }}
     >
-      <InfiniteScroll
-        dataLength={datas.length}
-        next={datas}
-        hasMore={data.length < 50}
-        loader={<Skeleton avatar paragraph={{ rows: 1 }} active />}
-        endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
-        scrollableTarget="scrollableDiv"
-      >
-        <List
-          className="not-drawer"
-          dataSource={datas}
-          renderItem={(item) => (
-            <List.Item key={item.id}>
-              <List.Item.Meta
-                avatar={
-                  <Avatar
-                    style={{ backgroundColor: item.read ? "gray" : "red" }}
-                  />
-                }
-                title={<a href="https://ant.design">{}</a>}
-                description={item.content}
-              />
-              <div>{item.title}</div>
-            </List.Item>
-          )}
-        />
-      </InfiniteScroll>
+      <List
+        dataSource={datas}
+        renderItem={(item) => (
+          <List.Item key={item.id}>
+            <List.Item.Meta
+              avatar={
+                <Avatar
+                  style={{ backgroundColor: item.read ? "gray" : "red" }}
+                />
+              }
+              title={<a href="https://ant.design">{}</a>}
+              description={item.content}
+            />
+            <div>{item.title}</div>
+          </List.Item>
+        )}
+      />
     </div>
   );
 }

@@ -55,7 +55,7 @@ var items = [
 
 export default function CustomLayout({ socket, token }) {
   let user = jwtDecode(token);
-  const [selectedUsername, setSelectedUsername] = useState("");
+  const [selectedUsername, setSelectedUsername] = useState("All Users");
 
   let isAdmin = user.user.role === "admin";
   if (items.length === 0) {
@@ -65,7 +65,6 @@ export default function CustomLayout({ socket, token }) {
       items.push(getItem("All Users", "All Users", <PieChartOutlined />));
       items.push(getItem("Add Task", "2", <DesktopOutlined />));
       items.push(getItem("User", "sub1", <UserOutlined />, []));
-      items.push(getItem("Files", "7", <FileOutlined />));
     }
 
     // items.push(getItem("Team", "sub2", <TeamOutlined />, [
@@ -161,7 +160,7 @@ export default function CustomLayout({ socket, token }) {
             setSelectedUsername={setSelectedUsername}
             items={usernames}
             socket={socket}
-          />{" "}
+          />
           {/* sider menu(left side) */}
         </Sider>
         <Layout className="site-layout">

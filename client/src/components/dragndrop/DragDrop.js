@@ -3,6 +3,8 @@ import "./dragDrop.css";
 import axios from "axios";
 import { Card, Divider, notification } from "antd";
 import FilterSearch from "../filter/FilterSearch";
+import Search from "antd/lib/transfer/search";
+import GroupTask from "./GroupTask";
 
 const baseUrl = "http://192.168.1.74:2000/api/v1/";
 
@@ -11,45 +13,16 @@ export default function DragDrop({ socket, username }) {
   const dragItem = useRef();
   const dragNode = useRef();
   const [groups, setGroups] = useState([]);
+  const [searchText, setSearchText] = useState([]);
+
+  // console.log("groups:", groups);
+
+  // useEffect(() => {
+  //   console.log("grps");
+  //   setFilteredData([...groups]);
+  // }, [groups]);
 
   //const groups = ["Backlog", "Doing", "Q&A", "Production"];
-  const getGroupTasks = (data) => {
-    username === "All Users"
-      ? data.forEach((element) => {
-          axios
-            .post(baseUrl + `tasks/getgrouptasks`, { groupid: element.id })
-            .then((response2) => {
-              setGroups((e) =>
-                e.map((x) => {
-                  if (x.id === element.id) {
-                    return { ...x, items: response2.data.data };
-                  }
-                  return { ...x, items: x.items ? x.items : [] };
-                })
-              );
-            });
-        })
-      : data.forEach((element) => {
-          axios
-            .post(baseUrl + `tasks/getgrouptasksbyusername`, {
-              groupid: element.id,
-              username,
-            })
-            .then((response2) => {
-              setGroups((e) =>
-                e.map((x) => {
-                  if (x.id === element.id) {
-                    return { ...x, items: response2.data.data };
-                  }
-                  return { ...x, items: x.items ? x.items : [] };
-                })
-              );
-            })
-            .catch((err) => {
-              console.error(err);
-            });
-        });
-  };
 
   const getAllGroups = () => {
     axios.get(baseUrl + "tasks/groups").then((response) => {
@@ -57,7 +30,7 @@ export default function DragDrop({ socket, username }) {
 
       setGroups(data);
 
-      getGroupTasks(data);
+      //getGroupTasks(data);
     });
   };
 
@@ -68,6 +41,8 @@ export default function DragDrop({ socket, username }) {
 
   const handleDragStart = (e, params) => {
     dragItem.current = params;
+    setDragging(true);
+
     //setDragging(true);
   };
 
@@ -80,24 +55,14 @@ export default function DragDrop({ socket, username }) {
         groupid: dragNode.current,
       })
       .then((response) => {
-        getAllGroups();
+        setDragging(false);
+
         //socket.emit("update_task_state", groupname);
         console.log(response.status);
       })
       .catch((err) => {
         console.log(err);
       });
-  };
-
-  const getStyles = () => {
-    const currentItem = dragItem.current;
-    if (
-      currentItem.grpIx === dragNode.current.grpIx &&
-      currentItem.itemIx === dragNode.current.itemIx
-    ) {
-      return "current dnd-item";
-    }
-    return "dnd-item";
   };
 
   const [api, contextHolder] = notification.useNotification();
@@ -114,12 +79,36 @@ export default function DragDrop({ socket, username }) {
       if (groupname) openNotification(groupname);
     });
   }, [socket]);
+  const searchHandler = (event) => {
+    if (event.target.value === "" || event.target.value === null) {
+      console.log(true);
+    } else {
+      //console.log(groups);
+      //groups içindeki items'a ihtiyaç var
+      console.log(false);
+
+      // console.log(event.target.value);
+      const temp = [...groups].map(function (element, index) {
+        element.items = element.items.filter((item) =>
+          item.task_content.includes(event.target.value)
+        );
+
+        return element;
+      });
+      console.log("temp:", temp);
+    }
+  };
 
   return (
     <>
-      {contextHolder}
-      <FilterSearch groups={groups} setGroups={setGroups} />
-
+      {/* {contextHolder} */}
+      <div style={{ margin: "10px" }}>
+        <Search
+          placeholder="Search"
+          onChange={(e) => setSearchText(e.target.value)}
+          style={{ width: 200 }}
+        />
+      </div>
       <header className="App-header">
         <div className="drag-n-drop">
           {/* <div className="dnd-group">
@@ -130,49 +119,21 @@ export default function DragDrop({ socket, username }) {
             <div
               key={grp.name}
               className="dnd-group"
-              //onDragEnter={handleDragEnter}
               onDragEnd={handleDragEnd}
               onDragOver={() => (dragNode.current = grp.id)}
             >
               <div className="group-title">{grp.name}</div>
               <Divider />
-              {grp.items &&
-                grp.items.map((item, itemIx) => (
-                  <div
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, item)}
-                    // onDragEnter=
-                    key={item.task_content}
-                    className={dragging ? getStyles() : "dnd-item"}
-                  >
-                    <Card
-                      title={item.task_content}
-                      bordered={false}
-                      type="inner"
-                      hoverable={true}
-                      style={{
-                        width: "100%",
-                      }}
-                    >
-                      <div
-                        style={{
-                          padding: "15px",
-                          backgroundColor:
-                            groups[grpIx] === "Q&A"
-                              ? "yellow"
-                              : groups[grpIx] === "Backlog"
-                              ? "red"
-                              : groups[grpIx] === "Doing"
-                              ? "orange"
-                              : "green",
-                          borderRadius: "5px",
-                        }}
-                      >
-                        <p>{item.description}</p>
-                      </div>
-                    </Card>
-                  </div>
-                ))}
+
+              <GroupTask
+                dragging={dragging}
+                dragItem={dragItem}
+                dragNode={dragNode}
+                username={username}
+                groupid={grp.id}
+                searchText={searchText}
+                handleDragStart={handleDragStart}
+              />
             </div>
           ))}
         </div>
