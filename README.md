@@ -13,7 +13,6 @@
 8. Authorization
 9. Password Validation
 10. Notification
-11. Websockets
-12. Socket.io
-13. Email with Nodemailer
-14. Antd
+11. Socket.io
+12. Email with Nodemailer
+13. Antd
